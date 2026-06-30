@@ -849,11 +849,9 @@ function renderTreino(t) {
                 <div class="serie-num">${i+1}ª</div>
                 <div class="serie-reps">${reps} reps</div>
                 <div style="display:flex;align-items:center;gap:6px;flex:1">
-                  <input type="number" class="carga-input" id="carga_${ex.id}_s${i}"
-                    placeholder="0" step="0.5" min="0"
-                    value="${state.cargas[ex.id+'_s'+i]||''}"
-                    oninput="saveCarga('${ex.id}',${i},this.value)"
-                    onblur="saveCarga('${ex.id}',${i},this.value)" />
+                  <input type="text" inputmode="decimal" class="carga-input" id="carga_${ex.id}_s${i}"
+                    placeholder="0" autocomplete="off"
+                    value="${state.cargas[ex.id+'_s'+i]||''}" />
                   <span class="carga-unit">kg</span>
                 </div>
                 <button class="check-serie ${state.seriesDone[ex.id+'_s'+i]?'done':''}"
@@ -890,13 +888,28 @@ function toggleExercise(id) {
 }
 
 function saveCarga(exId, serieIdx, val) {
-  if (val !== '' && val !== undefined) {
-    state.cargas[exId+'_s'+serieIdx] = parseFloat(val);
-  } else {
+  const v = String(val).replace(',', '.').trim();
+  if (v !== '' && !isNaN(parseFloat(v))) {
+    state.cargas[exId+'_s'+serieIdx] = parseFloat(v);
+  } else if (v === '') {
     delete state.cargas[exId+'_s'+serieIdx];
   }
   saveState();
 }
+
+// Delegated listener for all carga inputs — avoids inline handlers that can break on mobile
+document.addEventListener('change', function(e) {
+  if (!e.target.classList.contains('carga-input')) return;
+  const id = e.target.id; // "carga_A1_s0"
+  const parts = id.replace('carga_', '').split('_s');
+  if (parts.length === 2) saveCarga(parts[0], parseInt(parts[1]), e.target.value);
+});
+document.addEventListener('input', function(e) {
+  if (!e.target.classList.contains('carga-input')) return;
+  const id = e.target.id;
+  const parts = id.replace('carga_', '').split('_s');
+  if (parts.length === 2) saveCarga(parts[0], parseInt(parts[1]), e.target.value);
+});
 
 function toggleSerie(exId, serieIdx, t) {
   const key = exId+'_s'+serieIdx;
