@@ -195,7 +195,7 @@
   .serie-reps { font-size: .85rem; color: var(--text); min-width: 50px; }
   .carga-input {
     background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text); font-size: .9rem; font-weight: 600;
+    border-radius: 8px; color: var(--text); font-size: 16px; font-weight: 600;
     padding: 6px 10px; width: 80px; text-align: center;
     font-family: 'Inter', sans-serif; transition: border-color .2s;
   }
@@ -560,6 +560,7 @@ let state = {
 let saveTimeout = null;
 let unsubscribeSnapshot = null;
 let applyingRemoteUpdate = false;
+let lastPushTimestamp = null;
 
 function localKey(pin) {
   return 'meutreino_pin_' + pin;
@@ -651,6 +652,13 @@ function connectToCloud(pin) {
     unsubscribeSnapshot = window.firebaseOnSnapshot(ref, (snap) => {
       if (snap.exists()) {
         const remote = snap.data();
+
+        // Skip if this update is just the echo of our own save
+        if (remote.updatedAt && remote.updatedAt === lastPushTimestamp) {
+          setSyncStatus('synced', 'Sincronizado');
+          return;
+        }
+
         applyingRemoteUpdate = true;
         state = {
           selectedTreino: remote.selectedTreino || null,
@@ -660,12 +668,15 @@ function connectToCloud(pin) {
         };
         saveLocalState(pin, state);
         renderHome(); initCal(); renderHistory();
-        if (state.selectedTreino && document.getElementById('page-treino').classList.contains('active')) {
-          renderTreino(state.selectedTreino);
+
+        // Only refresh treino page if it's active AND user is not currently editing an input
+        const treinoActive = document.getElementById('page-treino').classList.contains('active');
+        const editingInput = document.activeElement && document.activeElement.classList.contains('carga-input');
+        if (state.selectedTreino && treinoActive && !editingInput) {
+          renderTreinoPreservingOpenCards(state.selectedTreino);
         }
         applyingRemoteUpdate = false;
       } else {
-        // No cloud doc yet — push current local state as the initial version
         pushToCloud(true);
       }
       setSyncStatus('synced', 'Sincronizado');
@@ -686,20 +697,40 @@ function pushToCloud(immediate) {
 
   const doSave = () => {
     setSyncStatus('syncing', 'Salvando...');
+    const ts = Date.now();
+    lastPushTimestamp = ts;
     const ref = window.firebaseDoc(window.firebaseDb, 'treinos', currentPin);
     window.firebaseSetDoc(ref, {
       selectedTreino: state.selectedTreino,
       cargas: state.cargas,
       seriesDone: state.seriesDone,
       history: state.history,
-      updatedAt: Date.now()
+      updatedAt: ts
     }).then(() => setSyncStatus('synced', 'Sincronizado'))
       .catch(err => { console.error(err); setSyncStatus('offline', 'Erro ao salvar'); });
   };
 
   if (immediate) { doSave(); return; }
   clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(doSave, 600);
+  saveTimeout = setTimeout(doSave, 800);
+}
+
+// Re-renders treino page but keeps open cards and preserves input focus/value
+function renderTreinoPreservingOpenCards(t) {
+  const openCards = new Set();
+  document.querySelectorAll('.series-grid.open').forEach(g => openCards.add(g.id));
+  const focusedId = document.activeElement ? document.activeElement.id : null;
+  renderTreino(t);
+  // Restore open cards
+  openCards.forEach(id => {
+    const g = document.getElementById(id);
+    if (g) g.classList.add('open');
+  });
+  // Restore focus
+  if (focusedId) {
+    const el = document.getElementById(focusedId);
+    if (el) { el.focus(); const len = el.value.length; el.setSelectionRange(len, len); }
+  }
 }
 
 // Replace old saveState calls with this unified function
