@@ -4,6 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MeuTreino</title>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCRPUb8YDM2WQeDRESrk6NuZGPm4z5SJc4",
+    authDomain: "meu-treino-rendell.firebaseapp.com",
+    projectId: "meu-treino-rendell",
+    storageBucket: "meu-treino-rendell.firebasestorage.app",
+    messagingSenderId: "135321461477",
+    appId: "1:135321461477:web:10592272a5c20901f6ea0c",
+    measurementId: "G-M5QLVL0GBT"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Expose to global scope so the regular (non-module) script can use it
+  window.firebaseDb = db;
+  window.firebaseDoc = doc;
+  window.firebaseGetDoc = getDoc;
+  window.firebaseSetDoc = setDoc;
+  window.firebaseOnSnapshot = onSnapshot;
+  window.firebaseReady = true;
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Barlow+Condensed:wght@400;600;700;800&display=swap');
 
@@ -257,13 +285,105 @@
     .page { padding: 14px; }
     .timer-display { font-size: 3rem; }
   }
+
+  /* USER SELECT SCREEN */
+  #userSelectScreen {
+    position: fixed; inset: 0; background: var(--bg); z-index: 2000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .user-select-title {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 1.8rem; font-weight: 800;
+    margin-bottom: 6px; text-align: center;
+  }
+  .user-select-sub { color: var(--muted); font-size: .85rem; margin-bottom: 32px; text-align: center; }
+  .user-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 420px; }
+  .user-card {
+    background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius);
+    padding: 24px 20px; width: 150px; cursor: pointer; transition: all .2s; text-align: center;
+  }
+  .user-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .user-avatar {
+    width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 1.6rem; font-weight: 800;
+  }
+  .user-card.u1 .user-avatar { background: rgba(59,130,246,.18); color: #3b82f6; }
+  .user-card.u2 .user-avatar { background: rgba(168,85,247,.18); color: #a855f7; }
+  .user-name { font-weight: 700; font-size: .95rem; }
+  .user-switch-btn {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 20px;
+    padding: 4px 12px; color: var(--muted); font-size: .75rem; cursor: pointer; display: flex; align-items: center; gap: 4px;
+  }
+
+  /* PIN LOGIN */
+  .pin-input {
+    background: var(--surface2); border: 2px solid var(--border); border-radius: 10px;
+    color: var(--text); font-size: 1.3rem; font-weight: 700; text-align: center;
+    padding: 14px; width: 220px; letter-spacing: 4px; font-family: 'Inter', sans-serif;
+    margin-bottom: 14px;
+  }
+  .pin-input:focus { outline: none; border-color: var(--accent); }
+  .pin-confirm-btn {
+    background: var(--accent); color: #000; border: none; border-radius: 10px;
+    padding: 12px 28px; font-weight: 700; font-size: .95rem; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+  }
+  .pin-back-btn {
+    background: none; border: none; color: var(--muted); font-size: .8rem;
+    cursor: pointer; margin-top: 14px; text-decoration: underline;
+  }
+  .sync-status {
+    position: fixed; top: 70px; right: 16px; z-index: 500;
+    font-size: .7rem; padding: 4px 10px; border-radius: 20px;
+    background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+    display: flex; align-items: center; gap: 5px; transition: all .3s;
+  }
+  .sync-status.syncing { color: var(--accent); border-color: var(--accent); }
+  .sync-status.synced { color: var(--c); border-color: var(--c); }
+  .sync-status.offline { color: var(--b); border-color: var(--b); }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 </style>
 </head>
 <body>
 
+<!-- USER SELECT SCREEN -->
+<div id="userSelectScreen">
+  <div id="selectStep">
+    <div class="user-select-title">Quem vai treinar? 💪</div>
+    <div class="user-select-sub">Selecione seu perfil para continuar</div>
+    <div class="user-cards">
+      <div class="user-card u1" onclick="goToPinStep('u1')">
+        <div class="user-avatar">👤</div>
+        <div class="user-name" id="u1Label">Você</div>
+      </div>
+      <div class="user-card u2" onclick="goToPinStep('u2')">
+        <div class="user-avatar">👤</div>
+        <div class="user-name" id="u2Label">Esposo</div>
+      </div>
+    </div>
+  </div>
+  <div id="pinStep" style="display:none;text-align:center">
+    <div class="user-select-title" id="pinStepTitle">Seu PIN</div>
+    <div class="user-select-sub">Digite um código de 4 a 6 dígitos.<br>Use sempre o mesmo para sincronizar seus dados.</div>
+    <input type="tel" inputmode="numeric" maxlength="6" class="pin-input" id="pinInput" placeholder="••••" autocomplete="off">
+    <br>
+    <button class="pin-confirm-btn" onclick="confirmPin()">Entrar</button>
+    <br>
+    <button class="pin-back-btn" onclick="backToSelect()">‹ Voltar</button>
+  </div>
+</div>
+
+<div class="sync-status" id="syncStatus" style="display:none">
+  <div class="sync-dot"></div><span id="syncStatusText">—</span>
+</div>
+
 <nav>
   <div class="logo">MEU<span>TREINO</span></div>
-  <div class="date-badge" id="navDate"></div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="user-switch-btn" onclick="openUserSelect()">👤 <span id="currentUserName">Você</span> ⇄</button>
+    <div class="date-badge" id="navDate"></div>
+  </div>
 </nav>
 
 <div class="tabs">
@@ -420,24 +540,185 @@ const TREINOS = {
   }
 };
 
+// USERS (just labels for the two profile slots)
+const USERS = {
+  u1: { name: 'Você' },
+  u2: { name: 'Esposo' }
+};
+let currentUser = null;   // 'u1' or 'u2'
+let currentPin = null;    // the actual sync key used in Firestore
+let pendingUserId = null;
+
 // STATE
 let state = {
   selectedTreino: null,
-  cargas: {},       // { 'A1_s0': 20, ... }
-  seriesDone: {},   // { 'A1_s0': true, ... }
-  history: [],      // [{ date, treino, timestamp }]
+  cargas: {},
+  seriesDone: {},
+  history: [],
 };
 
-function loadState() {
-  const saved = localStorage.getItem('meutreino_v2');
-  if (saved) state = JSON.parse(saved);
-  // fix arrays
-  if (!state.cargas) state.cargas = {};
-  if (!state.seriesDone) state.seriesDone = {};
-  if (!state.history) state.history = [];
+let saveTimeout = null;
+let unsubscribeSnapshot = null;
+let applyingRemoteUpdate = false;
+
+function localKey(pin) {
+  return 'meutreino_pin_' + pin;
 }
+
+function loadLocalState(pin) {
+  const saved = localStorage.getItem(localKey(pin));
+  if (saved) {
+    try { return JSON.parse(saved); } catch(e) {}
+  }
+  return { selectedTreino: null, cargas: {}, seriesDone: {}, history: [] };
+}
+
+function saveLocalState(pin, st) {
+  localStorage.setItem(localKey(pin), JSON.stringify(st));
+}
+
+function setSyncStatus(status, text) {
+  const el = document.getElementById('syncStatus');
+  const txt = document.getElementById('syncStatusText');
+  el.style.display = 'flex';
+  el.className = 'sync-status ' + status;
+  txt.textContent = text;
+}
+
+// ---- PIN flow UI ----
+function goToPinStep(userId) {
+  pendingUserId = userId;
+  document.getElementById('pinStepTitle').textContent = 'PIN de ' + USERS[userId].name;
+  document.getElementById('selectStep').style.display = 'none';
+  document.getElementById('pinStep').style.display = 'block';
+  const input = document.getElementById('pinInput');
+  input.value = '';
+  setTimeout(() => input.focus(), 50);
+}
+
+function backToSelect() {
+  document.getElementById('pinStep').style.display = 'none';
+  document.getElementById('selectStep').style.display = 'block';
+}
+
+function confirmPin() {
+  const val = document.getElementById('pinInput').value.trim();
+  if (val.length < 4) { showToast('PIN precisa ter pelo menos 4 dígitos'); return; }
+  loginWithPin(pendingUserId, val);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('pinInput');
+  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') confirmPin(); });
+});
+
+function loginWithPin(userId, pin) {
+  currentUser = userId;
+  currentPin = pin;
+  localStorage.setItem('meutreino_last_user', userId);
+  localStorage.setItem('meutreino_last_pin_' + userId, pin);
+
+  document.getElementById('userSelectScreen').style.display = 'none';
+  document.getElementById('currentUserName').textContent = USERS[userId].name;
+
+  // Load local copy first for instant UI, then sync with cloud
+  state = loadLocalState(pin);
+  renderHome(); initCal(); renderHistory(); showTab('home');
+
+  connectToCloud(pin);
+}
+
+function openUserSelect() {
+  document.getElementById('selectStep').style.display = 'block';
+  document.getElementById('pinStep').style.display = 'none';
+  document.getElementById('userSelectScreen').style.display = 'flex';
+}
+
+function initUserNames() {
+  document.getElementById('u1Label').textContent = USERS.u1.name;
+  document.getElementById('u2Label').textContent = USERS.u2.name;
+}
+
+// ---- Firestore sync ----
+function connectToCloud(pin) {
+  if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
+
+  function start() {
+    if (!window.firebaseReady) return;
+    setSyncStatus('syncing', 'Conectando...');
+    const ref = window.firebaseDoc(window.firebaseDb, 'treinos', pin);
+
+    unsubscribeSnapshot = window.firebaseOnSnapshot(ref, (snap) => {
+      if (snap.exists()) {
+        const remote = snap.data();
+        applyingRemoteUpdate = true;
+        state = {
+          selectedTreino: remote.selectedTreino || null,
+          cargas: remote.cargas || {},
+          seriesDone: remote.seriesDone || {},
+          history: remote.history || []
+        };
+        saveLocalState(pin, state);
+        renderHome(); initCal(); renderHistory();
+        if (state.selectedTreino && document.getElementById('page-treino').classList.contains('active')) {
+          renderTreino(state.selectedTreino);
+        }
+        applyingRemoteUpdate = false;
+      } else {
+        // No cloud doc yet — push current local state as the initial version
+        pushToCloud(true);
+      }
+      setSyncStatus('synced', 'Sincronizado');
+    }, (err) => {
+      console.error('Firestore sync error', err);
+      setSyncStatus('offline', 'Offline (local)');
+    });
+  }
+
+  if (window.firebaseReady) start();
+  else window.addEventListener('firebase-ready', start, { once: true });
+}
+
+function pushToCloud(immediate) {
+  if (!currentPin) return;
+  saveLocalState(currentPin, state);
+  if (!window.firebaseReady) { setSyncStatus('offline', 'Offline (local)'); return; }
+
+  const doSave = () => {
+    setSyncStatus('syncing', 'Salvando...');
+    const ref = window.firebaseDoc(window.firebaseDb, 'treinos', currentPin);
+    window.firebaseSetDoc(ref, {
+      selectedTreino: state.selectedTreino,
+      cargas: state.cargas,
+      seriesDone: state.seriesDone,
+      history: state.history,
+      updatedAt: Date.now()
+    }).then(() => setSyncStatus('synced', 'Sincronizado'))
+      .catch(err => { console.error(err); setSyncStatus('offline', 'Erro ao salvar'); });
+  };
+
+  if (immediate) { doSave(); return; }
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(doSave, 600);
+}
+
+// Replace old saveState calls with this unified function
 function saveState() {
-  localStorage.setItem('meutreino_v2', JSON.stringify(state));
+  if (applyingRemoteUpdate) return; // don't echo back a remote update
+  pushToCloud(false);
+}
+
+// Auto-login if we remember the last user + their pin
+function tryAutoLogin() {
+  const lastUser = localStorage.getItem('meutreino_last_user');
+  if (lastUser && USERS[lastUser]) {
+    const savedPin = localStorage.getItem('meutreino_last_pin_' + lastUser);
+    if (savedPin) {
+      loginWithPin(lastUser, savedPin);
+      return true;
+    }
+  }
+  return false;
 }
 
 // ==================== TIMER ====================
@@ -616,7 +897,7 @@ function finalizarTreino(t) {
   // remove existing entry for today
   state.history = state.history.filter(h => h.date !== today);
   state.history.unshift({ date: today, treino: t, timestamp: Date.now() });
-  saveState();
+  pushToCloud(true);
   showToast('🎉 Treino finalizado! Ótimo trabalho!', 'success');
   renderHome();
   renderCalendar();
@@ -773,10 +1054,10 @@ function showTab(name) {
 }
 
 // ==================== INIT ====================
-loadState();
-renderHome();
-initCal();
-renderHistory();
+initUserNames();
+if (!tryAutoLogin()) {
+  document.getElementById('userSelectScreen').style.display = 'flex';
+}
 </script>
 </body>
 </html>
