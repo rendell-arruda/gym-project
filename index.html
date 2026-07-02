@@ -166,7 +166,43 @@ nav {
 .obs-area { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 8px 10px; font-family: 'Inter', sans-serif; resize: none; margin-top: 10px; }
 .obs-area:focus { outline: none; border-color: var(--muted); }
 
-/* CHART */
+/* FLOATING TIMER on treino page */
+.float-timer {
+  position: sticky; top: 98px; z-index: 90;
+  background: rgba(13,15,20,.97); backdrop-filter: blur(12px);
+  border: 1px solid var(--border); border-radius: 14px;
+  margin-bottom: 14px; padding: 10px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.float-timer-display {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; font-weight: 800;
+  min-width: 56px; color: var(--text); line-height: 1; transition: color .3s;
+}
+.float-timer-display.running { color: var(--accent); }
+.float-timer-display.done { color: var(--c); }
+.float-timer-ring { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+.float-timer-ring svg { transform: rotate(-90deg); }
+.ftr-bg { fill: none; stroke: var(--surface2); stroke-width: 4; }
+.ftr-fill { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset .9s linear, stroke .3s; }
+.ftr-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .65rem; font-weight: 700; color: var(--muted); }
+.float-timer-btns { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+.ft-btn { padding: 6px 10px; border-radius: 7px; border: none; cursor: pointer; font-weight: 600; font-size: .72rem; transition: all .2s; }
+.ft-q { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.ft-start { background: var(--accent); color: #000; min-width: 64px; }
+.ft-reset { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+/* QUICK LOAD buttons */
+.carga-row { display: flex; align-items: center; gap: 4px; }
+.ql-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: .85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .15s; }
+.ql-btn:active { background: var(--border); }
+
+/* Serie counter badge */
+.serie-counter { font-size: .65rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 8px; color: var(--muted); margin-left: 4px; }
+.serie-counter.all-done { background: var(--c-glow); border-color: var(--c); color: var(--c); }
+
+/* unsaved dot */
+.unsaved-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: none; margin-left: 4px; }
+.unsaved-dot.show { display: inline-block; }
 .chart-wrap { margin-top: 12px; }
 .chart-title { font-size: .65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
 .mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 48px; }
@@ -235,11 +271,11 @@ nav {
     <div class="user-cards">
       <div class="user-card u1" onclick="goToPinStep('u1')">
         <div class="user-avatar">🏋️‍♀️</div>
-        <div class="user-name" id="u1Label">Você</div>
+        <div class="user-name" id="u1Label">Rendell</div>
       </div>
       <div class="user-card u2" onclick="goToPinStep('u2')">
         <div class="user-avatar">🏋️‍♂️</div>
-        <div class="user-name" id="u2Label">Esposo</div>
+        <div class="user-name" id="u2Label">Nego</div>
       </div>
     </div>
   </div>
@@ -322,6 +358,24 @@ nav {
 
 <!-- TREINO -->
 <div class="page" id="page-treino">
+  <!-- Floating timer -->
+  <div class="float-timer" id="floatTimer">
+    <div class="float-timer-ring">
+      <svg viewBox="0 0 44 44" width="44" height="44">
+        <circle class="ftr-bg" cx="22" cy="22" r="18"/>
+        <circle class="ftr-fill" id="ftrRing" cx="22" cy="22" r="18" stroke-dasharray="113.1" stroke-dashoffset="0"/>
+      </svg>
+      <div class="ftr-text" id="ftrText">1:00</div>
+    </div>
+    <div class="float-timer-display" id="ftrDisplay">1:00</div>
+    <div class="float-timer-btns">
+      <button class="ft-btn ft-q" onclick="ftSetTimer(30)">30s</button>
+      <button class="ft-btn ft-q" onclick="ftSetTimer(60)">1min</button>
+      <button class="ft-btn ft-q" onclick="ftSetTimer(90)">1:30</button>
+      <button class="ft-btn ft-start" onclick="ftToggle()" id="ftrStartBtn">▶</button>
+      <button class="ft-btn ft-reset" onclick="ftReset()">↺</button>
+    </div>
+  </div>
   <div id="treinoContent"></div>
 </div>
 
@@ -433,7 +487,7 @@ Object.values(TREINOS).forEach(t => t.sections.forEach(s => s.exercises.forEach(
 // ============================================================
 // USERS & STATE
 // ============================================================
-const USERS = { u1:{ name:'Você' }, u2:{ name:'Esposo' } };
+const USERS = { u1:{ name:'Rendell' }, u2:{ name:'Nego' } };
 let currentUser = null, currentPin = null, pendingUserId = null;
 
 let state = {
@@ -569,54 +623,75 @@ function saveState(){
 }
 
 // ============================================================
-// TIMER
+// TIMER (shared state, two UIs: home ring + floating treino)
 // ============================================================
 let timerSec=60, timerRunning=false, timerInterval=null, timerFull=60;
 const CIRCUMFERENCE=276.5;
+const FT_CIRC=113.1;
 
-function updateTimerRing(){
-  const pct=timerSec/timerFull;
-  const offset=CIRCUMFERENCE*(1-pct);
+function updateTimerUIs(){
+  const pct=timerFull>0?timerSec/timerFull:0;
+  const label=timerSec<=0?'✓':formatTime(timerSec);
+  const cls=timerSec<=0?'done':timerRunning?'running':'';
+
+  // Home ring
   const ring=document.getElementById('timerRing');
-  if(ring){ ring.style.strokeDashoffset=offset; ring.style.stroke=pct<=0.2?'#ef4444':pct<=0.5?'#f59e0b':'#f59e0b'; }
+  if(ring){ ring.style.strokeDashoffset=CIRCUMFERENCE*(1-pct); ring.style.stroke=pct<=0.2?'#ef4444':'#f59e0b'; }
+  const disp=document.getElementById('timerDisplay');
+  if(disp){ disp.textContent=label; disp.className='timer-ring-text'+(cls?' '+cls:''); }
+  const sb=document.getElementById('timerStartBtn');
+  if(sb) sb.textContent=timerRunning?'⏸ Pausar':'▶ Iniciar';
+
+  // Floating timer
+  const fring=document.getElementById('ftrRing');
+  if(fring){ fring.style.strokeDashoffset=FT_CIRC*(1-pct); fring.style.stroke=pct<=0.2?'#ef4444':'#f59e0b'; }
+  const ftext=document.getElementById('ftrText');
+  if(ftext) ftext.textContent=timerSec<=0?'✓':formatTime(timerSec);
+  const fdisp=document.getElementById('ftrDisplay');
+  if(fdisp){ fdisp.textContent=label; fdisp.className='float-timer-display'+(cls?' '+cls:''); }
+  const fsb=document.getElementById('ftrStartBtn');
+  if(fsb) fsb.textContent=timerRunning?'⏸':'▶';
 }
-function setTimer(s){ resetTimer(); timerSec=s; timerFull=s; document.getElementById('timerDisplay').textContent=formatTime(s); updateTimerRing(); }
+
+function setTimer(s){ resetTimer(); timerSec=s; timerFull=s; updateTimerUIs(); }
+function ftSetTimer(s){ setTimer(s); }
 function formatTime(s){ return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
-function toggleTimer(){
-  if(timerRunning){ clearInterval(timerInterval); timerRunning=false; document.getElementById('timerStartBtn').textContent='▶ Iniciar'; }
-  else {
-    if(timerSec<=0) resetTimer();
-    timerRunning=true; document.getElementById('timerStartBtn').textContent='⏸ Pausar';
-    timerInterval=setInterval(()=>{
-      timerSec--;
-      const d=document.getElementById('timerDisplay');
-      d.textContent=formatTime(Math.max(0,timerSec));
-      updateTimerRing();
-      if(timerSec<=0){
-        clearInterval(timerInterval); timerRunning=false;
-        d.textContent='✓ Pronto!'; d.className='timer-ring-text done';
-        document.getElementById('timerStartBtn').textContent='▶ Iniciar';
-        showToast('⏰ Descansou! Próxima série!','success');
-        // Vibrate on mobile
-        if(navigator.vibrate) navigator.vibrate([200,100,200]);
-        timerSec=timerFull;
-      } else if(timerSec<=3){ d.className='timer-ring-text running'; }
-      else { d.className='timer-ring-text'; }
-    },1000);
-  }
+
+function startTimerEngine(){
+  timerRunning=true;
+  timerInterval=setInterval(()=>{
+    timerSec--;
+    updateTimerUIs();
+    if(timerSec<=0){
+      clearInterval(timerInterval); timerRunning=false;
+      showToast('⏰ Descansou! Próxima série!','success');
+      if(navigator.vibrate) navigator.vibrate([200,100,200]);
+      timerSec=timerFull;
+      setTimeout(updateTimerUIs,100);
+    }
+  },1000);
 }
+
+function toggleTimer(){
+  if(timerRunning){ clearInterval(timerInterval); timerRunning=false; updateTimerUIs(); }
+  else { if(timerSec<=0) timerSec=timerFull; startTimerEngine(); }
+}
+function ftToggle(){ toggleTimer(); }
+
 function resetTimer(){
   clearInterval(timerInterval); timerRunning=false; timerSec=timerFull;
-  const d=document.getElementById('timerDisplay');
-  d.textContent=formatTime(timerSec); d.className='timer-ring-text';
-  document.getElementById('timerStartBtn').textContent='▶ Iniciar';
-  updateTimerRing();
+  updateTimerUIs();
 }
+function ftReset(){ resetTimer(); }
 
 // ============================================================
 // TREINO SELECT
 // ============================================================
 function selectTreino(t){
+  // Clear series done marks if switching to a different treino
+  if(state.selectedTreino && state.selectedTreino !== t){
+    state.seriesDone = {};
+  }
   state.selectedTreino=t;
   ['A','B','C'].forEach(x=>{ document.getElementById('btn'+x).className='treino-btn'+(x===t?' sel-'+x:''); });
   const names={A:'Iniciar Treino A — Costas + Bíceps',B:'Iniciar Treino B — Peito + Tríceps',C:'Iniciar Treino C — Ombro + Abdômen'};
@@ -632,8 +707,7 @@ function goToTreino(){
 // ============================================================
 // RENDER TREINO
 // ============================================================
-function getLastCarga(exId, serieIdx){
-  // look in history for last session this exercise was done
+function getLastCarga(exId){
   const hist=state.cargaHistory[exId];
   if(hist&&hist.length>0) return hist[hist.length-1].max;
   return null;
@@ -644,22 +718,52 @@ function getPR(exId){
   return Math.max(...hist.map(h=>h.max));
 }
 
+function adjustCarga(exId, si, delta){
+  const key=exId+'_s'+si;
+  const current=parseFloat(state.cargas[key])||0;
+  const next=Math.max(0, Math.round((current+delta)*10)/10);
+  state.cargas[key]=next;
+  const inp=document.getElementById('carga_'+exId+'_s'+si);
+  if(inp) inp.value=next;
+  const pr=getPR(exId);
+  if(pr&&next>pr){ inp&&inp.classList.add('is-pr'); }
+  else { inp&&inp.classList.remove('is-pr'); }
+  saveState();
+}
+
 function renderTreino(t){
   const treino=TREINOS[t];
   const color=treino.color;
+  // Count total progress
+  let totalAll=0, doneAll=0;
+  treino.sections.forEach(s=>s.exercises.forEach(ex=>ex.series.forEach((_,i)=>{ totalAll++; if(state.seriesDone[ex.id+'_s'+i]) doneAll++; })));
+  const pctAll=totalAll?Math.round(doneAll/totalAll*100):0;
+
   let html=`<div class="treino-header-card" style="border-left:4px solid ${color}">
     <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Treino de Hoje</div>
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;color:${color}">${treino.name}</div>
     <div style="font-size:.78rem;color:var(--muted)">${treino.desc}</div>
-    <div style="font-size:.7rem;color:var(--muted);margin-top:6px">⏱ 1 min descanso &nbsp;·&nbsp; 📈 Progressão de carga</div>
+    <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:.7rem;color:var(--muted)">${doneAll}/${totalAll} séries</span>
+      <span style="font-size:.7rem;color:${color};font-weight:700">${pctAll}%</span>
+    </div>
+    <div style="background:var(--surface2);border-radius:20px;height:4px;margin-top:4px">
+      <div style="height:100%;border-radius:20px;background:${color};width:${pctAll}%;transition:width .4s"></div>
+    </div>
   </div>`;
 
+  let firstOpen = true; // auto-open first incomplete exercise
   treino.sections.forEach(sec=>{
     html+=`<div class="section-header"><div class="section-badge">${sec.name}</div><div class="section-line"></div></div>`;
     sec.exercises.forEach(ex=>{
-      const allDone=ex.series.every((_,i)=>state.seriesDone[ex.id+'_s'+i]);
+      const doneSeries=ex.series.filter((_,i)=>state.seriesDone[ex.id+'_s'+i]).length;
+      const allDone=doneSeries===ex.series.length;
       const pr=getPR(ex.id);
-      const lastMax=getLastCarga(ex.id, 0);
+      const lastMax=getLastCarga(ex.id);
+      // auto-open first not-done exercise
+      const autoOpen = firstOpen && !allDone;
+      if(autoOpen) firstOpen=false;
+
       html+=`<div class="exercise-card ${allDone?'done-card':''}" id="card_${ex.id}">
         <div class="exercise-header" onclick="toggleExercise('${ex.id}')">
           <div class="ex-num">${ex.id.replace(/[ABC]/,'')}</div>
@@ -670,26 +774,30 @@ function renderTreino(t){
               <span class="ex-tag tag-rep">${ex.series.join('/')} reps</span>
               ${ex.dropset?'<span class="ex-tag tag-dropset">DROP SET</span>':''}
               ${ex.nosdescanso?'<span class="ex-tag tag-nosdescanso">S/ DESCANSO</span>':''}
-              ${pr?`<span class="pr-badge">🏆 PR ${pr}kg</span>`:''}
+              ${pr?`<span class="pr-badge">🏆 ${pr}kg</span>`:''}
+              <span class="serie-counter ${allDone?'all-done':''}">${doneSeries}/${ex.series.length}</span>
             </div>
             ${lastMax?`<div class="last-carga-hint">Último: ${lastMax}kg</div>`:''}
           </div>
-          <div class="ex-toggle" id="toggle_${ex.id}">›</div>
+          <div class="ex-toggle ${autoOpen?'open':''}" id="toggle_${ex.id}">›</div>
         </div>
-        <div class="series-grid" id="grid_${ex.id}">
+        <div class="series-grid ${autoOpen?'open':''}" id="grid_${ex.id}">
           <div class="series-header-row">
-            <span>Série</span><span>Reps</span><span>Carga</span><span>kg</span><span></span>
+            <span>Série</span><span>Reps</span><span style="grid-column:span 2">Carga (kg)</span><span></span>
           </div>
           ${ex.series.map((reps,i)=>{
             const key=ex.id+'_s'+i;
-            const val=state.cargas[key]||'';
+            const val=state.cargas[key]!==undefined?state.cargas[key]:'';
             const prVal=getPR(ex.id);
-            const isPR=prVal&&val&&parseFloat(val)>prVal;
+            const isPR=prVal&&val!==''&&parseFloat(val)>prVal;
             return `<div class="serie-row">
               <div class="serie-num">${i+1}ª</div>
               <div class="serie-reps">${reps}</div>
-              <input type="text" inputmode="decimal" class="carga-input ${isPR?'is-pr':''}" id="carga_${ex.id}_s${i}" placeholder="${lastMax||'0'}" autocomplete="off" value="${val}" />
-              <div class="carga-unit">kg</div>
+              <div class="carga-row" style="grid-column:span 2">
+                <button class="ql-btn" onclick="adjustCarga('${ex.id}',${i},-2.5)">−</button>
+                <input type="text" inputmode="decimal" class="carga-input ${isPR?'is-pr':''}" id="carga_${ex.id}_s${i}" placeholder="${lastMax||'0'}" autocomplete="off" value="${val}" style="flex:1;width:auto" />
+                <button class="ql-btn" onclick="adjustCarga('${ex.id}',${i},+2.5)">+</button>
+              </div>
               <button class="check-serie ${state.seriesDone[key]?'done':''}" id="check_${ex.id}_s${i}" onclick="toggleSerie('${ex.id}',${i},'${t}')">
                 ${state.seriesDone[key]?'✓':''}
               </button>
@@ -697,25 +805,20 @@ function renderTreino(t){
           }).join('')}
           ${ex.note?`<div class="ex-note">${ex.note}</div>`:''}
           ${renderMiniChart(ex.id)}
-          <textarea class="obs-area" id="obs_${ex.id}" placeholder="Observações deste exercício..." rows="2" oninput="saveObs('${ex.id}',this.value)">${state.cargas['obs_'+ex.id]||''}</textarea>
+          <textarea class="obs-area" id="obs_${ex.id}" placeholder="Observações..." rows="2" oninput="saveObs('${ex.id}',this.value)">${state.cargas['obs_'+ex.id]||''}</textarea>
         </div>
       </div>`;
     });
   });
 
   if(treino.finalizacao){
-    html+=`<div class="final-card">
-      <div class="final-icon">🏃</div>
-      <div class="final-title">Finalização</div>
-      <div class="final-sub">${treino.finalizacao}</div>
-    </div>`;
+    html+=`<div class="final-card"><div class="final-icon">🏃</div><div class="final-title">Finalização</div><div class="final-sub">${treino.finalizacao}</div></div>`;
   }
 
-  // Obs geral do treino
   const todayObs=getTodayObs(t);
   html+=`<div style="margin-top:16px">
     <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">📝 Observações do treino</div>
-    <textarea class="obs-area" id="obs_treino_geral" placeholder="Como foi o treino hoje? Algo diferente?" rows="3" oninput="saveTreinoObs(this.value)">${todayObs}</textarea>
+    <textarea class="obs-area" id="obs_treino_geral" placeholder="Como foi o treino hoje?" rows="3" oninput="saveTreinoObs(this.value)">${todayObs}</textarea>
   </div>`;
 
   html+=`<button class="finish-btn" style="background:${color};color:${t==='C'?'#000':'#fff'}" onclick="finalizarTreino('${t}')">FINALIZAR TREINO ${t} 🏁</button>`;
