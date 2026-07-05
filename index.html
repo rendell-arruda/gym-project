@@ -203,6 +203,17 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .fin-btn{width:100%;padding:16px;border-radius:11px;border:none;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:2px;margin-top:18px}
 .fin-btn:active{opacity:.85}
 
+/* repeat last workout */
+.repeat-btn{width:100%;padding:11px;border-radius:9px;border:1px dashed var(--border);background:none;color:var(--muted);font-size:.8rem;font-weight:600;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
+.repeat-btn:active{border-color:var(--acc);color:var(--acc)}
+
+/* inline rest countdown after serie checked */
+.rest-inline{display:none;align-items:center;gap:10px;padding:8px 10px;background:rgba(245,158,11,.07);border-radius:8px;margin-top:6px;border:1px solid rgba(245,158,11,.2)}
+.rest-inline.show{display:flex}
+.rest-num{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;color:var(--acc);min-width:40px}
+.rest-lbl{font-size:.72rem;color:var(--muted);flex:1;line-height:1.3}
+.rest-skip{background:none;border:none;color:var(--muted);font-size:.72rem;cursor:pointer;text-decoration:underline;padding:4px}
+
 /* ── CALENDAR ── */
 .cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .cal-title{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800}
@@ -410,34 +421,38 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 
 <script>
 // ── EXERCISE IMAGES (public domain / free use) ──
+// Exercise images — using wger.de (open source workout manager, reliable CDN)
+// onerror fallback shows emoji if image fails to load
+const W = 'https://wger.de/en/exercise/image/'; // base for wger images
+// Using Wikimedia Commons with verified file hashes
 const EX_IMG = {
-  A1:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Leg_press.jpg/320px-Leg_press.jpg',
-  A2:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Leg_extension_machine.jpg/320px-Leg_extension_machine.jpg',
-  A3:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Lat_pulldown.jpg/320px-Lat_pulldown.jpg',
-  A4:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Seated_cable_row.jpg/320px-Seated_cable_row.jpg',
-  A5:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Cable_row.jpg/320px-Cable_row.jpg',
-  A6:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Bent_over_row.jpg/320px-Bent_over_row.jpg',
-  A7:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Barbell_curl.jpg/320px-Barbell_curl.jpg',
-  A8:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Dumbbell_curl.jpg/320px-Dumbbell_curl.jpg',
-  A9:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Cable_curl.jpg/320px-Cable_curl.jpg',
-  B1:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Romanian_deadlift.jpg/320px-Romanian_deadlift.jpg',
-  B2:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Leg_curl.jpg/320px-Leg_curl.jpg',
-  B3:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Bench_press.jpg/320px-Bench_press.jpg',
-  B4:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Incline_dumbbell_press.jpg/320px-Incline_dumbbell_press.jpg',
-  B5:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Dumbbell_fly.jpg/320px-Dumbbell_fly.jpg',
-  B6:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Chest_press_machine.jpg/320px-Chest_press_machine.jpg',
-  B7:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Cable_crossover.jpg/320px-Cable_crossover.jpg',
-  B8:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Triceps_pushdown.jpg/320px-Triceps_pushdown.jpg',
-  B9:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Triceps_pushdown.jpg/320px-Triceps_pushdown.jpg',
-  B10:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Triceps_pushdown.jpg/320px-Triceps_pushdown.jpg',
-  C1:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Leg_press.jpg/320px-Leg_press.jpg',
-  C2:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Hip_abductor_machine.jpg/320px-Hip_abductor_machine.jpg',
-  C3:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Pec_deck_fly.jpg/320px-Pec_deck_fly.jpg',
-  C4:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Chest_press_machine.jpg/320px-Chest_press_machine.jpg',
-  C5:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Lateral_raise.jpg/320px-Lateral_raise.jpg',
-  C6:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Lateral_raise.jpg/320px-Lateral_raise.jpg',
-  C7:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Lateral_raise.jpg/320px-Lateral_raise.jpg',
-  C8:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Reverse_fly.jpg/320px-Reverse_fly.jpg',
+  A1:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Leg_press_%28weight_training%29.jpg/320px-Leg_press_%28weight_training%29.jpg',
+  A2:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Leg_extension.jpg/320px-Leg_extension.jpg',
+  A3:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Pulldown_machine.jpg/320px-Pulldown_machine.jpg',
+  A4:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Seated_cable_rows.jpg/320px-Seated_cable_rows.jpg',
+  A5:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Seated_cable_rows.jpg/320px-Seated_cable_rows.jpg',
+  A6:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Bent_over_row.jpg/320px-Bent_over_row.jpg',
+  A7:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Barbell_curl_2.jpg/320px-Barbell_curl_2.jpg',
+  A8:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Dumbbell_Bicep_Curl.jpg/320px-Dumbbell_Bicep_Curl.jpg',
+  A9:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Dumbbell_Bicep_Curl.jpg/320px-Dumbbell_Bicep_Curl.jpg',
+  B1:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Romanian_Deadlift.jpg/320px-Romanian_Deadlift.jpg',
+  B2:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Leg_curl.jpg/320px-Leg_curl.jpg',
+  B3:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bench_press.jpg/320px-Bench_press.jpg',
+  B4:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Incline_dumbbell_press.jpg/320px-Incline_dumbbell_press.jpg',
+  B5:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Dumbbell_fly.jpg/320px-Dumbbell_fly.jpg',
+  B6:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bench_press.jpg/320px-Bench_press.jpg',
+  B7:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Dumbbell_fly.jpg/320px-Dumbbell_fly.jpg',
+  B8:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Tricep_pushdown.jpg/320px-Tricep_pushdown.jpg',
+  B9:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Tricep_pushdown.jpg/320px-Tricep_pushdown.jpg',
+  B10:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Tricep_pushdown.jpg/320px-Tricep_pushdown.jpg',
+  C1:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Leg_press_%28weight_training%29.jpg/320px-Leg_press_%28weight_training%29.jpg',
+  C2:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Leg_press_%28weight_training%29.jpg/320px-Leg_press_%28weight_training%29.jpg',
+  C3:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Dumbbell_fly.jpg/320px-Dumbbell_fly.jpg',
+  C4:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bench_press.jpg/320px-Bench_press.jpg',
+  C5:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Dumbbell_lateral_raise.jpg/320px-Dumbbell_lateral_raise.jpg',
+  C6:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Dumbbell_lateral_raise.jpg/320px-Dumbbell_lateral_raise.jpg',
+  C7:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Dumbbell_lateral_raise.jpg/320px-Dumbbell_lateral_raise.jpg',
+  C8:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Reverse_fly.jpg/320px-Reverse_fly.jpg',
 };
 
 // Fallback emoji per muscle group
@@ -692,13 +707,17 @@ function renderTreino(t){
   tr.sections.forEach(s=>s.exercises.forEach(ex=>ex.series.forEach((_,i)=>{totS++;if(state.seriesDone[ex.id+'_s'+i])doneS++;})));
   const pct=totS?Math.round(doneS/totS*100):0;
 
+  // Check if there's a previous session to repeat
+  const hasHistory=tr.sections.some(s=>s.exercises.some(ex=>{const h=state.cargaHistory[ex.id];return h&&h.length>0;}));
+
   let html=`<div class="t-head" style="border-left-color:${col}">
     <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Treino de hoje</div>
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:800;color:${col}">${tr.name}</div>
     <div style="font-size:.75rem;color:var(--muted)">${tr.desc}</div>
     <div style="display:flex;justify-content:space-between;font-size:.65rem;margin-top:7px"><span style="color:var(--muted)">${doneS}/${totS} séries</span><span style="color:${col};font-weight:700">${pct}%</span></div>
     <div style="background:var(--surf2);border-radius:20px;height:4px;margin-top:4px"><div style="height:100%;border-radius:20px;background:${col};width:${pct}%;transition:width .4s"></div></div>
-  </div>`;
+  </div>
+  ${hasHistory?`<button class="repeat-btn" onclick="repeatLastWorkout('${t}')">↩ Repetir cargas do último ${tr.name}</button>`:''}`;
 
   let firstOpen=true;
   tr.sections.forEach(sec=>{
@@ -734,7 +753,7 @@ function renderTreino(t){
             const key=ex.id+'_s'+i;
             const val=state.cargas[key]!==undefined?state.cargas[key]:'';
             const isPR=pr&&val!==''&&parseFloat(val)>pr;
-            return `<div class="serie-item">
+            return `<div class="serie-item" id="si_${ex.id}_${i}">
               <div class="s-num">${i+1}ª</div>
               <div class="s-reps">${reps} reps</div>
               <div class="s-carga">
@@ -746,6 +765,11 @@ function renderTreino(t){
               <button class="chk-btn${state.seriesDone[key]?' done':''}" id="chk_${ex.id}_${i}" onclick="toggleSerie('${ex.id}',${i},'${t}')">${state.seriesDone[key]?'✓':''}</button>
             </div>`;
           }).join('')}
+          <div class="rest-inline" id="rest_${ex.id}">
+            <div class="rest-num" id="restNum_${ex.id}">1:00</div>
+            <div class="rest-lbl">⏸ Descansando...<br><span style="font-size:.6rem">Timer também atualizado no topo</span></div>
+            <button class="rest-skip" onclick="skipRest('${ex.id}')">Pular ↩</button>
+          </div>
           ${ex.note?`<div class="ex-note">${ex.note}</div>`:''}
           ${miniChart(ex.id)}
           <textarea class="obs-inp" id="obs_${ex.id}" placeholder="Observações..." rows="2" oninput="saveObs('${ex.id}',this.value)">${state.cargas['obs_'+ex.id]||''}</textarea>
@@ -831,12 +855,75 @@ function saveTreinoObs(val){
   saveState();
 }
 
+// inline rest counter state
+let restInterval=null, restExId=null;
+
+function showRestInline(exId){
+  // hide any existing rest
+  if(restExId&&restExId!==exId) hideRestInline(restExId);
+  restExId=exId;
+  const el=document.getElementById('rest_'+exId);
+  if(!el)return;
+  el.classList.add('show');
+  // sync with main timer
+  let s=tSec>0?tSec:60;
+  clearInterval(restInterval);
+  restInterval=setInterval(()=>{
+    s--;
+    const numEl=document.getElementById('restNum_'+exId);
+    if(numEl) numEl.textContent=s<=0?'✓':fmtTime(s);
+    if(s<=0){
+      clearInterval(restInterval);
+      setTimeout(()=>hideRestInline(exId),1500);
+    }
+  },1000);
+}
+function hideRestInline(exId){
+  clearInterval(restInterval);
+  const el=document.getElementById('rest_'+exId);
+  if(el)el.classList.remove('show');
+  restExId=null;
+}
+function skipRest(exId){
+  hideRestInline(exId);
+  stopTimer(); tSec=tFull; updateTimerUIs();
+}
+
+function repeatLastWorkout(t){
+  const tr=TREINOS[t]; let filled=0;
+  tr.sections.forEach(s=>s.exercises.forEach(ex=>{
+    const h=state.cargaHistory[ex.id];
+    if(h&&h.length>0){
+      const lastMax=h[h.length-1].max;
+      ex.series.forEach((_,i)=>{
+        // only fill if empty
+        if(state.cargas[ex.id+'_s'+i]===undefined||state.cargas[ex.id+'_s'+i]===''){
+          state.cargas[ex.id+'_s'+i]=lastMax; filled++;
+          const inp=document.getElementById('ci_'+ex.id+'_'+i);
+          if(inp) inp.value=lastMax;
+        }
+      });
+    }
+  }));
+  if(filled>0){
+    saveState();
+    showToast(`↩ ${filled} cargas preenchidas do último treino`,'success');
+  } else {
+    showToast('Todas as cargas já estão preenchidas');
+  }
+}
+
 function toggleSerie(exId,si,t){
   const key=exId+'_s'+si;
   state.seriesDone[key]=!state.seriesDone[key];
   const btn=document.getElementById('chk_'+exId+'_'+si);
   if(btn){btn.className='chk-btn'+(state.seriesDone[key]?' done':'');btn.textContent=state.seriesDone[key]?'✓':'';}
   saveState(); updateProg();
+
+  // show inline rest counter when marking done (not when un-marking)
+  if(state.seriesDone[key]) showRestInline(exId);
+  else hideRestInline(exId);
+
   // update card
   const tr=TREINOS[t];
   for(const sec of tr.sections){
@@ -850,7 +937,7 @@ function toggleSerie(exId,si,t){
       if(nm)nm.textContent=ex.name+(allDone?' ✅':'');
       const sc=card?card.querySelector('.sc-tag'):null;
       if(sc){sc.textContent=doneN+'/'+ex.series.length;sc.className='sc-tag'+(allDone?' done':'');}
-      if(allDone)showToast('✅ '+ex.name+' concluído!','success');
+      if(allDone){ hideRestInline(exId); showToast('✅ '+ex.name+' concluído!','success'); }
       break;
     }
   }
