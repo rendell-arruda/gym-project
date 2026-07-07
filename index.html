@@ -146,8 +146,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .ex-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;transition:border-color .2s}
 .ex-card.done-card{border-color:rgba(34,197,94,.35)}
 .ex-head{padding:13px 12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;user-select:none}
-.ex-img{width:52px;height:52px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--surf2)}
-.ex-img-placeholder{width:52px;height:52px;border-radius:8px;background:var(--surf2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.ex-img-wrap{width:52px;height:52px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--surf2)}
+.ex-img-wrap svg{width:52px;height:52px}
+.ex-photo-wrap{width:100%;border-radius:10px;overflow:hidden;margin-bottom:12px;background:var(--surf2)}
+.ex-photo-wrap svg{width:100%;height:140px}
 .ex-info{flex:1;min-width:0}
 .ex-name{font-weight:700;font-size:.9rem;line-height:1.3;margin-bottom:4px}
 .ex-tags{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
@@ -171,12 +173,12 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .ex-photo-placeholder{width:100%;height:100px;border-radius:8px;background:var(--surf2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--muted);margin-bottom:10px}
 
 /* serie rows */
-.serie-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(37,45,61,.8)}
+.serie-item{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid rgba(37,45,61,.8)}
 .serie-item:last-of-type{border-bottom:none}
-.s-num{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;color:var(--muted);min-width:22px}
-.s-reps{font-size:.8rem;color:var(--text);min-width:44px}
-.s-carga{display:flex;align-items:center;gap:6px;flex:1}
-.adj-btn{width:36px;height:36px;border-radius:7px;border:1px solid var(--border);background:var(--surf2);color:var(--text);font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;min-height:36px}
+.s-num{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;color:var(--muted);min-width:20px}
+.s-reps{font-size:.75rem;color:var(--muted);min-width:38px}
+.s-carga{display:flex;align-items:center;gap:5px;flex:1;min-width:0}
+.adj-btn{width:38px;height:38px;border-radius:7px;border:1px solid var(--border);background:var(--surf2);color:var(--text);font-size:1.2rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;min-height:38px}
 .adj-btn:active{background:var(--border)}
 .c-inp{background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:16px;font-weight:700;padding:8px 4px;flex:1;text-align:center;font-family:'Inter',sans-serif;min-height:36px;-webkit-appearance:none}
 .c-inp:focus{outline:none;border-color:var(--acc);background:#252d40}
@@ -421,46 +423,136 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 
 <script>
 // ── EXERCISE IMAGES (public domain / free use) ──
-// Exercise images — using wger.de (open source workout manager, reliable CDN)
-// onerror fallback shows emoji if image fails to load
-const W = 'https://wger.de/en/exercise/image/'; // base for wger images
-// Using Wikimedia Commons with verified file hashes
-const EX_IMG = {
-  A1:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Leg_press_%28weight_training%29.jpg/320px-Leg_press_%28weight_training%29.jpg',
-  A2:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Leg_extension.jpg/320px-Leg_extension.jpg',
-  A3:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Pulldown_machine.jpg/320px-Pulldown_machine.jpg',
-  A4:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Seated_cable_rows.jpg/320px-Seated_cable_rows.jpg',
-  A5:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Seated_cable_rows.jpg/320px-Seated_cable_rows.jpg',
-  A6:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Bent_over_row.jpg/320px-Bent_over_row.jpg',
-  A7:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Barbell_curl_2.jpg/320px-Barbell_curl_2.jpg',
-  A8:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Dumbbell_Bicep_Curl.jpg/320px-Dumbbell_Bicep_Curl.jpg',
-  A9:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Dumbbell_Bicep_Curl.jpg/320px-Dumbbell_Bicep_Curl.jpg',
-  B1:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Romanian_Deadlift.jpg/320px-Romanian_Deadlift.jpg',
-  B2:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Leg_curl.jpg/320px-Leg_curl.jpg',
-  B3:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bench_press.jpg/320px-Bench_press.jpg',
-  B4:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Incline_dumbbell_press.jpg/320px-Incline_dumbbell_press.jpg',
-  B5:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Dumbbell_fly.jpg/320px-Dumbbell_fly.jpg',
-  B6:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bench_press.jpg/320px-Bench_press.jpg',
-  B7:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Dumbbell_fly.jpg/320px-Dumbbell_fly.jpg',
-  B8:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Tricep_pushdown.jpg/320px-Tricep_pushdown.jpg',
-  B9:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Tricep_pushdown.jpg/320px-Tricep_pushdown.jpg',
-  B10:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Tricep_pushdown.jpg/320px-Tricep_pushdown.jpg',
-  C1:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Leg_press_%28weight_training%29.jpg/320px-Leg_press_%28weight_training%29.jpg',
-  C2:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Leg_press_%28weight_training%29.jpg/320px-Leg_press_%28weight_training%29.jpg',
-  C3:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Dumbbell_fly.jpg/320px-Dumbbell_fly.jpg',
-  C4:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bench_press.jpg/320px-Bench_press.jpg',
-  C5:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Dumbbell_lateral_raise.jpg/320px-Dumbbell_lateral_raise.jpg',
-  C6:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Dumbbell_lateral_raise.jpg/320px-Dumbbell_lateral_raise.jpg',
-  C7:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Dumbbell_lateral_raise.jpg/320px-Dumbbell_lateral_raise.jpg',
-  C8:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Reverse_fly.jpg/320px-Reverse_fly.jpg',
-};
+// SVG illustrations for each muscle group — inline, no external URLs needed
+function getExSVG(exId, large=false){
+  const W = large ? '100%' : '52';
+  const H = large ? '140' : '52';
+  const RX = large ? '10' : '10';
+  const group = {
+    A1:'leg', A2:'leg', A3:'back', A4:'back', A5:'back', A6:'back',
+    A7:'bicep', A8:'bicep', A9:'bicep',
+    B1:'leg', B2:'leg', B3:'chest', B4:'chest', B5:'chest', B6:'chest', B7:'chest',
+    B8:'tricep', B9:'tricep', B10:'tricep',
+    C1:'leg', C2:'leg', C3:'shoulder', C4:'shoulder', C5:'shoulder',
+    C6:'shoulder', C7:'shoulder', C8:'shoulder'
+  }[exId] || 'chest';
 
-// Fallback emoji per muscle group
-const EX_EMOJI = {
-  A1:'🦵',A2:'🦵',A3:'💪',A4:'💪',A5:'💪',A6:'💪',A7:'💪',A8:'💪',A9:'💪',
-  B1:'🦵',B2:'🦵',B3:'🫁',B4:'🫁',B5:'🫁',B6:'🫁',B7:'🫁',B8:'💪',B9:'💪',B10:'💪',
-  C1:'🦵',C2:'🦵',C3:'🫁',C4:'🫁',C5:'💪',C6:'💪',C7:'💪',C8:'💪'
-};
+  // Scale factor for large mode
+  const s = large ? 2.7 : 1;
+  const cx = large ? 70 : 26;
+  const cy = large ? 70 : 26;
+
+  const labels = {
+    chest:'PEITO', back:'COSTAS', leg:'PERNA',
+    bicep:'BÍCEPS', tricep:'TRÍCEPS', shoulder:'OMBRO'
+  };
+  const colors = {
+    chest:'#3b82f6', back:'#8b5cf6', leg:'#22c55e',
+    bicep:'#f59e0b', tricep:'#ef4444', shoulder:'#06b6d4'
+  };
+  const col = colors[group];
+  const lbl = labels[group];
+
+  // Body figure SVGs scaled for thumb (52x52) or large (full width x 140)
+  const vb = large ? '0 0 200 140' : '0 0 52 52';
+
+  const figures = {
+    chest: large
+      ? `<ellipse cx="100" cy="55" rx="30" ry="25" fill="${col}" opacity=".8"/>
+         <ellipse cx="62" cy="52" rx="18" ry="14" fill="${col}"/>
+         <ellipse cx="138" cy="52" rx="18" ry="14" fill="${col}"/>
+         <rect x="85" y="78" width="30" height="35" rx="8" fill="#2a3048"/>
+         <circle cx="100" cy="25" r="14" fill="#64748b"/>
+         <rect x="93" y="37" width="14" height="16" rx="5" fill="#64748b"/>
+         <path d="M62 55 Q40 65 44 90" stroke="#64748b" stroke-width="8" stroke-linecap="round"/>
+         <path d="M138 55 Q160 65 156 90" stroke="#64748b" stroke-width="8" stroke-linecap="round"/>
+         <text x="100" y="128" text-anchor="middle" fill="${col}" font-size="11" font-weight="700" font-family="Inter,sans-serif" letter-spacing="2">${lbl}</text>`
+      : `<rect x="14" y="18" width="24" height="20" rx="4" fill="#2a3048"/>
+         <path d="M14 20 Q8 24 10 30 Q14 33 20 31 L20 20Z" fill="${col}" opacity=".9"/>
+         <path d="M38 20 Q44 24 42 30 Q38 33 32 31 L32 20Z" fill="${col}" opacity=".9"/>
+         <circle cx="26" cy="10" r="5" fill="#64748b"/>
+         <rect x="23" y="14" width="6" height="5" rx="2" fill="#64748b"/>`,
+
+    back: large
+      ? `<rect x="75" y="45" width="50" height="60" rx="10" fill="#2a3048"/>
+         <path d="M75 50 Q45 65 50 90 L75 90Z" fill="${col}" opacity=".9"/>
+         <path d="M125 50 Q155 65 150 90 L125 90Z" fill="${col}" opacity=".9"/>
+         <path d="M80 50 Q100 42 120 50" stroke="${col}" stroke-width="6" stroke-linecap="round" opacity=".8"/>
+         <rect x="97" y="48" width="6" height="50" rx="3" fill="${col}" opacity=".3"/>
+         <circle cx="100" cy="25" r="14" fill="#64748b"/>
+         <rect x="93" y="37" width="14" height="10" rx="4" fill="#64748b"/>
+         <text x="100" y="128" text-anchor="middle" fill="${col}" font-size="11" font-weight="700" font-family="Inter,sans-serif" letter-spacing="2">${lbl}</text>`
+      : `<rect x="14" y="18" width="24" height="20" rx="4" fill="#2a3048"/>
+         <path d="M14 20 Q7 26 10 34 L14 34Z" fill="${col}" opacity=".9"/>
+         <path d="M38 20 Q45 26 42 34 L38 34Z" fill="${col}" opacity=".9"/>
+         <rect x="25" y="20" width="2" height="16" rx="1" fill="${col}" opacity=".4"/>
+         <path d="M18 18 Q26 14 34 18" stroke="${col}" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+         <circle cx="26" cy="10" r="5" fill="#64748b"/>`,
+
+    leg: large
+      ? `<rect x="72" y="38" width="56" height="20" rx="8" fill="#2a3048"/>
+         <path d="M72 52 Q60 80 64 115 L90 115 Q88 80 90 52Z" fill="${col}" opacity=".9"/>
+         <path d="M128 52 Q140 80 136 115 L110 115 Q112 80 110 52Z" fill="${col}" opacity=".9"/>
+         <rect x="60" y="110" width="32" height="10" rx="5" fill="#64748b"/>
+         <rect x="108" y="110" width="32" height="10" rx="5" fill="#64748b"/>
+         <circle cx="100" cy="20" r="14" fill="#64748b"/>
+         <rect x="93" y="32" width="14" height="8" rx="4" fill="#64748b"/>
+         <text x="100" y="136" text-anchor="middle" fill="${col}" font-size="11" font-weight="700" font-family="Inter,sans-serif" letter-spacing="2">${lbl}</text>`
+      : `<rect x="14" y="14" width="24" height="10" rx="3" fill="#2a3048"/>
+         <path d="M14 22 Q11 33 13 44 L20 44 Q20 33 20 22Z" fill="${col}" opacity=".9"/>
+         <path d="M38 22 Q41 33 39 44 L32 44 Q32 33 32 22Z" fill="${col}" opacity=".9"/>
+         <rect x="12" y="41" width="9" height="4" rx="2" fill="#64748b"/>
+         <rect x="31" y="41" width="9" height="4" rx="2" fill="#64748b"/>`,
+
+    bicep: large
+      ? `<rect x="88" y="20" width="24" height="80" rx="12" fill="#2a3048"/>
+         <path d="M88 35 Q65 48 68 72 Q75 88 100 84 Q125 88 132 72 Q135 48 112 35Z" fill="${col}" opacity=".9"/>
+         <rect x="90" y="94" width="20" height="28" rx="8" fill="#64748b"/>
+         <ellipse cx="100" cy="30" rx="20" ry="12" fill="#64748b"/>
+         <text x="100" y="136" text-anchor="middle" fill="${col}" font-size="11" font-weight="700" font-family="Inter,sans-serif" letter-spacing="2">${lbl}</text>`
+      : `<rect x="22" y="10" width="8" height="32" rx="4" fill="#2a3048"/>
+         <path d="M22 18 Q14 23 16 32 Q20 37 26 35 Q32 37 36 32 Q38 23 30 18Z" fill="${col}" opacity=".9"/>
+         <rect x="23" y="36" width="6" height="8" rx="3" fill="#64748b"/>
+         <ellipse cx="26" cy="14" rx="8" ry="4" fill="#64748b"/>`,
+
+    tricep: large
+      ? `<rect x="88" y="20" width="24" height="80" rx="12" fill="#2a3048"/>
+         <path d="M112 35 Q138 50 134 74 Q128 88 100 84 L112 35Z" fill="${col}" opacity=".9"/>
+         <path d="M88 35 Q62 50 66 74 Q72 88 100 84 L88 35Z" fill="${col}" opacity=".7"/>
+         <rect x="90" y="94" width="20" height="28" rx="8" fill="#64748b"/>
+         <ellipse cx="100" cy="30" rx="20" ry="12" fill="#64748b"/>
+         <text x="100" y="136" text-anchor="middle" fill="${col}" font-size="11" font-weight="700" font-family="Inter,sans-serif" letter-spacing="2">${lbl}</text>`
+      : `<rect x="22" y="10" width="8" height="30" rx="4" fill="#2a3048"/>
+         <path d="M30 18 Q38 24 36 33 Q32 37 26 35 L30 18Z" fill="${col}" opacity=".9"/>
+         <path d="M22 18 Q14 24 16 33 Q20 37 26 35 L22 18Z" fill="${col}" opacity=".7"/>
+         <rect x="23" y="35" width="6" height="8" rx="3" fill="#64748b"/>
+         <ellipse cx="26" cy="14" rx="8" ry="4" fill="#64748b"/>`,
+
+    shoulder: large
+      ? `<rect x="82" y="62" width="36" height="45" rx="8" fill="#2a3048"/>
+         <ellipse cx="62" cy="58" rx="22" ry="18" fill="${col}" opacity=".9"/>
+         <ellipse cx="138" cy="58" rx="22" ry="18" fill="${col}" opacity=".9"/>
+         <rect x="91" y="44" width="18" height="20" rx="6" fill="#64748b"/>
+         <circle cx="100" cy="24" r="16" fill="#64748b"/>
+         <path d="M44 68 Q36 92 40 115" stroke="#64748b" stroke-width="10" stroke-linecap="round"/>
+         <path d="M156 68 Q164 92 160 115" stroke="#64748b" stroke-width="10" stroke-linecap="round"/>
+         <text x="100" y="136" text-anchor="middle" fill="${col}" font-size="11" font-weight="700" font-family="Inter,sans-serif" letter-spacing="2">${lbl}</text>`
+      : `<rect x="19" y="24" width="18" height="16" rx="3" fill="#2a3048"/>
+         <ellipse cx="12" cy="22" rx="8" ry="7" fill="${col}" opacity=".9"/>
+         <ellipse cx="40" cy="22" rx="8" ry="7" fill="${col}" opacity=".9"/>
+         <rect x="22" y="16" width="8" height="9" rx="2" fill="#64748b"/>
+         <circle cx="26" cy="12" r="5" fill="#64748b"/>
+         <path d="M6 26 Q4 36 6 42" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+         <path d="M46 26 Q48 36 46 42" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>`,
+  };
+
+  const body = figures[group] || figures.chest;
+  return `<svg viewBox="${vb}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="${large?200:52}" height="${large?140:52}" rx="${RX}" fill="#161a23"/>
+    ${body}
+  </svg>`;
+}
+
 
 // ── TREINO DATA ──
 const TREINOS = {
@@ -727,13 +819,12 @@ function renderTreino(t){
       const allDone=doneN===ex.series.length;
       const pr=getPR(ex.id); const lc=lastCarga(ex.id);
       const autoOpen=firstOpen&&!allDone; if(autoOpen)firstOpen=false;
-      const imgUrl=EX_IMG[ex.id]; const emoji=EX_EMOJI[ex.id]||'💪';
+      const thumbSVG=getExSVG(ex.id);
+      const photoSVG=getExSVG(ex.id, true);
 
       html+=`<div class="ex-card${allDone?' done-card':''}" id="card_${ex.id}">
         <div class="ex-head" onclick="toggleEx('${ex.id}')">
-          ${imgUrl
-            ?`<img class="ex-img" src="${imgUrl}" alt="${ex.name}" onerror="this.outerHTML='<div class=ex-img-placeholder>${emoji}</div>'">`
-            :`<div class="ex-img-placeholder">${emoji}</div>`}
+          <div class="ex-img-wrap">${thumbSVG}</div>
           <div class="ex-info">
             <div class="ex-name">${ex.name}${allDone?' ✅':''}</div>
             <div class="ex-tags">
@@ -748,14 +839,14 @@ function renderTreino(t){
           <div class="ex-arr${autoOpen?' open':''}" id="arr_${ex.id}">›</div>
         </div>
         <div class="ex-body${autoOpen?' open':''}" id="body_${ex.id}">
-          ${imgUrl?`<img class="ex-photo" src="${imgUrl}" alt="${ex.name}" onerror="this.style.display='none'">`:''}
+          <div class="ex-photo-wrap">${photoSVG}</div>
           ${ex.series.map((reps,i)=>{
             const key=ex.id+'_s'+i;
             const val=state.cargas[key]!==undefined?state.cargas[key]:'';
             const isPR=pr&&val!==''&&parseFloat(val)>pr;
             return `<div class="serie-item" id="si_${ex.id}_${i}">
               <div class="s-num">${i+1}ª</div>
-              <div class="s-reps">${reps} reps</div>
+              <div class="s-reps">${reps}</div>
               <div class="s-carga">
                 <button class="adj-btn" onclick="adj('${ex.id}',${i},-2.5)">−</button>
                 <input type="text" inputmode="decimal" class="c-inp${isPR?' is-pr':''}" id="ci_${ex.id}_${i}" placeholder="${lc||'0'}" autocomplete="off" value="${val}">
