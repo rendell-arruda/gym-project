@@ -146,10 +146,11 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .ex-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;transition:border-color .2s}
 .ex-card.done-card{border-color:rgba(34,197,94,.35)}
 .ex-head{padding:13px 12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;user-select:none}
-.ex-img-wrap{width:52px;height:52px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--surf2)}
-.ex-img-wrap svg{width:52px;height:52px}
-.ex-photo-wrap{width:100%;border-radius:10px;overflow:hidden;margin-bottom:12px;background:var(--surf2)}
-.ex-photo-wrap svg{width:100%;height:140px}
+.ex-img-wrap{width:48px;height:48px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.ex-photo-banner{width:100%;border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.ex-photo-banner-icon{font-size:2.2rem}
+.ex-photo-banner-name{font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:1px}
+.ex-photo-banner-sub{font-size:.72rem;opacity:.65;margin-top:2px}
 .ex-info{flex:1;min-width:0}
 .ex-name{font-weight:700;font-size:.9rem;line-height:1.3;margin-bottom:4px}
 .ex-tags{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
@@ -168,24 +169,21 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .ex-body{display:none;border-top:1px solid var(--border);padding:10px 12px 12px}
 .ex-body.open{display:block}
 
-/* photo full */
-.ex-photo{width:100%;border-radius:8px;object-fit:cover;max-height:160px;margin-bottom:10px;background:var(--surf2)}
-.ex-photo-placeholder{width:100%;height:100px;border-radius:8px;background:var(--surf2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--muted);margin-bottom:10px}
-
-/* serie rows */
-.serie-item{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid rgba(37,45,61,.8)}
+/* serie rows — TWO LINE layout: info on top, carga controls below */
+.serie-item{padding:10px 0;border-bottom:1px solid rgba(37,45,61,.7)}
 .serie-item:last-of-type{border-bottom:none}
-.s-num{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;color:var(--muted);min-width:20px}
-.s-reps{font-size:.75rem;color:var(--muted);min-width:38px}
-.s-carga{display:flex;align-items:center;gap:5px;flex:1;min-width:0}
-.adj-btn{width:38px;height:38px;border-radius:7px;border:1px solid var(--border);background:var(--surf2);color:var(--text);font-size:1.2rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;min-height:38px}
+.serie-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.s-num{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;color:var(--muted);min-width:22px}
+.s-reps{font-size:.85rem;color:var(--text);font-weight:600;flex:1}
+.chk-btn{width:42px;height:42px;border-radius:50%;border:2px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;transition:all .2s;font-weight:900}
+.chk-btn.done{background:var(--c);border-color:var(--c);color:#000}
+.serie-bot{display:flex;align-items:center;gap:8px}
+.adj-btn{width:48px;height:48px;border-radius:10px;border:1px solid var(--border);background:var(--surf2);color:var(--text);font-size:1.4rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
 .adj-btn:active{background:var(--border)}
-.c-inp{background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:16px;font-weight:700;padding:8px 4px;flex:1;text-align:center;font-family:'Inter',sans-serif;min-height:36px;-webkit-appearance:none}
+.c-inp{background:var(--surf2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:16px;font-weight:700;padding:12px 4px;flex:1;text-align:center;font-family:'Inter',sans-serif;-webkit-appearance:none}
 .c-inp:focus{outline:none;border-color:var(--acc);background:#252d40}
 .c-inp.is-pr{border-color:var(--acc)}
-.c-unit{font-size:.62rem;color:var(--muted);text-align:center;min-width:14px}
-.chk-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;min-height:36px;transition:all .2s}
-.chk-btn.done{background:var(--c);border-color:var(--c);color:#000;font-weight:900}
+.c-unit{font-size:.7rem;color:var(--muted);min-width:20px;text-align:center}
 
 .ex-note{font-size:.7rem;color:#c084fc;margin-top:8px;padding:8px;background:rgba(168,85,247,.07);border-radius:7px;border-left:3px solid #a855f7;line-height:1.5}
 
@@ -819,12 +817,13 @@ function renderTreino(t){
       const allDone=doneN===ex.series.length;
       const pr=getPR(ex.id); const lc=lastCarga(ex.id);
       const autoOpen=firstOpen&&!allDone; if(autoOpen)firstOpen=false;
-      const thumbSVG=getExSVG(ex.id);
-      const photoSVG=getExSVG(ex.id, true);
+      const muscleEmoji = {leg:'🦵',back:'🔙',chest:'🫁',bicep:'💪',tricep:'💪',shoulder:'🏋️'};
+      const muscleGroup = {A1:'leg',A2:'leg',A3:'back',A4:'back',A5:'back',A6:'back',A7:'bicep',A8:'bicep',A9:'bicep',B1:'leg',B2:'leg',B3:'chest',B4:'chest',B5:'chest',B6:'chest',B7:'chest',B8:'tricep',B9:'tricep',B10:'tricep',C1:'leg',C2:'leg',C3:'shoulder',C4:'shoulder',C5:'shoulder',C6:'shoulder',C7:'shoulder',C8:'shoulder'}[ex.id];
+      const exEmoji = muscleEmoji[muscleGroup] || '💪';
 
       html+=`<div class="ex-card${allDone?' done-card':''}" id="card_${ex.id}">
         <div class="ex-head" onclick="toggleEx('${ex.id}')">
-          <div class="ex-img-wrap">${thumbSVG}</div>
+          <div class="ex-img-wrap" style="background:${col}18;font-size:1.6rem">${exEmoji}</div>
           <div class="ex-info">
             <div class="ex-name">${ex.name}${allDone?' ✅':''}</div>
             <div class="ex-tags">
@@ -839,21 +838,29 @@ function renderTreino(t){
           <div class="ex-arr${autoOpen?' open':''}" id="arr_${ex.id}">›</div>
         </div>
         <div class="ex-body${autoOpen?' open':''}" id="body_${ex.id}">
-          <div class="ex-photo-wrap">${photoSVG}</div>
+          <div class="ex-photo-banner" style="background:${col}18;border:1px solid ${col}30">
+            <div class="ex-photo-banner-icon">${{leg:'🦵',back:'🔙',chest:'🫁',bicep:'💪',tricep:'💪',shoulder:'🏋️'}[{A1:'leg',A2:'leg',A3:'back',A4:'back',A5:'back',A6:'back',A7:'bicep',A8:'bicep',A9:'bicep',B1:'leg',B2:'leg',B3:'chest',B4:'chest',B5:'chest',B6:'chest',B7:'chest',B8:'tricep',B9:'tricep',B10:'tricep',C1:'leg',C2:'leg',C3:'shoulder',C4:'shoulder',C5:'shoulder',C6:'shoulder',C7:'shoulder',C8:'shoulder'}[ex.id]]||'💪'}</div>
+            <div>
+              <div class="ex-photo-banner-name" style="color:${col}">${ex.name}</div>
+              <div class="ex-photo-banner-sub" style="color:${col}">⏱ 1min descanso &nbsp;·&nbsp; 📈 Progressão de carga${ex.nosdescanso?' &nbsp;·&nbsp; 🔁 Sem descanso':''}</div>
+            </div>
+          </div>
           ${ex.series.map((reps,i)=>{
             const key=ex.id+'_s'+i;
             const val=state.cargas[key]!==undefined?state.cargas[key]:'';
             const isPR=pr&&val!==''&&parseFloat(val)>pr;
             return `<div class="serie-item" id="si_${ex.id}_${i}">
-              <div class="s-num">${i+1}ª</div>
-              <div class="s-reps">${reps}</div>
-              <div class="s-carga">
+              <div class="serie-top">
+                <div class="s-num">${i+1}ª</div>
+                <div class="s-reps">${reps} repetições</div>
+                <button class="chk-btn${state.seriesDone[key]?' done':''}" id="chk_${ex.id}_${i}" onclick="toggleSerie('${ex.id}',${i},'${t}')">${state.seriesDone[key]?'✓':''}</button>
+              </div>
+              <div class="serie-bot">
                 <button class="adj-btn" onclick="adj('${ex.id}',${i},-2.5)">−</button>
-                <input type="text" inputmode="decimal" class="c-inp${isPR?' is-pr':''}" id="ci_${ex.id}_${i}" placeholder="${lc||'0'}" autocomplete="off" value="${val}">
+                <input type="text" inputmode="decimal" class="c-inp${isPR?' is-pr':''}" id="ci_${ex.id}_${i}" placeholder="${lc||'kg'}" autocomplete="off" value="${val}">
                 <button class="adj-btn" onclick="adj('${ex.id}',${i},2.5)">+</button>
                 <span class="c-unit">kg</span>
               </div>
-              <button class="chk-btn${state.seriesDone[key]?' done':''}" id="chk_${ex.id}_${i}" onclick="toggleSerie('${ex.id}',${i},'${t}')">${state.seriesDone[key]?'✓':''}</button>
             </div>`;
           }).join('')}
           <div class="rest-inline" id="rest_${ex.id}">
