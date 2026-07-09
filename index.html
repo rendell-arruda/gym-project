@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MeuTreino">
+<meta name="theme-color" content="#0d0f14">
 <title>MeuTreino</title>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
@@ -265,9 +269,58 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .toast.show{opacity:1}
 .toast.success{border-color:var(--c);color:var(--c)}
 .toast.pr{border-color:var(--acc);color:var(--acc)}
+
+/* PWA hint */
+.pwa-hint{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px}
+.pwa-hint-text{font-size:.72rem;color:var(--muted);line-height:1.5;flex:1}
+.pwa-hint-text strong{color:var(--text);display:block;margin-bottom:2px}
+.pwa-hint-close{background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:0 4px;flex-shrink:0}
+
+/* suggestion card */
+.suggest-card{background:var(--surf);border:1px solid rgba(245,158,11,.25);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.suggest-text{flex:1;font-size:.78rem;line-height:1.4;color:var(--muted)}
+.suggest-text strong{color:var(--acc);display:block;font-size:.85rem;margin-bottom:2px}
+.suggest-btn{background:var(--acc);color:#000;border:none;border-radius:7px;padding:7px 12px;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0}
+
+/* week compare */
+.week-compare{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:14px}
+.wc-title{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.wc-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.wc-row:last-child{margin-bottom:0}
+.wc-lbl{font-size:.68rem;color:var(--muted);min-width:90px}
+.wc-bar-wrap{flex:1;background:var(--surf2);border-radius:20px;height:7px;overflow:hidden}
+.wc-bar{height:100%;border-radius:20px;transition:width .6s}
+.wc-val{font-size:.7rem;font-weight:700;min-width:20px;text-align:right}
+.wc-delta{font-size:.68rem;font-weight:700;min-width:38px;text-align:right}
+
+/* confetti */
+#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:8000;display:none}
+
+/* finish popup */
+@keyframes popIn{0%{transform:scale(.5) translate(-50%,20px);opacity:0}70%{transform:scale(1.05) translate(-50%,0)}100%{transform:scale(1) translate(-50%,0);opacity:1}}
+.finish-popup{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;transform:translate(-50%,0);background:linear-gradient(135deg,#1e2330,#252d40);border:2px solid var(--acc);border-radius:16px;padding:18px 28px;text-align:center;z-index:8001;display:none}
+.finish-popup.show{display:block;animation:popIn .4s ease forwards}
+.fp-icon{font-size:2.5rem;line-height:1;margin-bottom:6px}
+.fp-title{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;color:var(--acc);margin-bottom:2px}
+.fp-sub{font-size:.75rem;color:var(--muted)}
+
+/* volume in history */
+.h-vol{font-size:.62rem;color:var(--acc);font-weight:600;margin-top:2px}
+
+/* editable user names */
+.name-row{display:flex;gap:6px;margin-top:10px;align-items:center}
+.name-inp{background:var(--surf2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:.9rem;padding:7px 10px;flex:1;font-family:'Inter',sans-serif;text-align:center}
+.name-inp:focus{outline:none;border-color:var(--acc)}
+.name-save{background:var(--acc);color:#000;border:none;border-radius:7px;padding:7px 14px;font-size:.8rem;font-weight:700;cursor:pointer}
 </style>
 </head>
 <body>
+<canvas id="confettiCanvas"></canvas>
+<div class="finish-popup" id="finishPopup">
+  <div class="fp-icon">🏆</div>
+  <div class="fp-title" id="fpTitle">Treino Concluído!</div>
+  <div class="fp-sub" id="fpSub">Ótimo trabalho!</div>
+</div>
 
 <!-- USER SELECT -->
 <div id="userSelectScreen">
@@ -277,13 +330,19 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
     <div class="user-cards">
       <div class="user-card u1" onclick="goPin('u1')">
         <div class="user-avatar">🏋️‍♀️</div>
-        <div class="user-name">Rendell</div>
+        <div class="user-name" id="u1Label">Rendell</div>
       </div>
       <div class="user-card u2" onclick="goPin('u2')">
         <div class="user-avatar">🏋️‍♂️</div>
-        <div class="user-name">Nego</div>
+        <div class="user-name" id="u2Label">Nego</div>
       </div>
     </div>
+    <div class="name-row" style="margin-top:20px;max-width:300px">
+      <input class="name-inp" id="nameInpU1" placeholder="Nome perfil 1" maxlength="12">
+      <input class="name-inp" id="nameInpU2" placeholder="Nome perfil 2" maxlength="12">
+      <button class="name-save" onclick="saveNames()">✓</button>
+    </div>
+    <div style="font-size:.62rem;color:var(--muted);margin-top:6px;text-align:center">Toque nos campos para renomear os perfis</div>
   </div>
   <div class="pin-wrap" id="pinStep">
     <div class="pin-title" id="pinTitle">Seu PIN</div>
@@ -315,9 +374,11 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 
 <!-- HOME -->
 <div class="page active" id="page-home">
+  <div id="pwaHint"></div>
   <div id="streakArea"></div>
   <div class="home-greeting" id="homeGreet"></div>
   <div class="home-date" id="homeDate"></div>
+  <div id="suggestArea"></div>
 
   <div class="treino-selector">
     <div class="tsel-btn" id="tselA" onclick="selectTreino('A')">
@@ -343,6 +404,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
     <div class="stat-box"><div class="stat-n" id="stStreak">0</div><div class="stat-l">🔥 Sequência</div></div>
     <div class="stat-box"><div class="stat-n" id="stWeek">0</div><div class="stat-l">Esta semana</div></div>
   </div>
+  <div id="weekCompareArea"></div>
 
   <div class="timer-box">
     <div class="timer-label">⏱ Timer de Descanso</div>
@@ -360,7 +422,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
       <button class="t-pre" onclick="setTimer(120)">2 min</button>
     </div>
     <div class="timer-controls">
-      <button class="t-go" onclick="toggleTimer()" id="trBtn">▶ Iniciar</button>
+      <button class="t-go" onclick="if(!notifyAsked){notifyAsked=true;requestNotifyPermission();}toggleTimer()" id="trBtn">▶ Iniciar</button>
       <button class="t-rst" onclick="resetTimer()">↺ Reset</button>
     </div>
   </div>
@@ -381,7 +443,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
       <button class="ft-q" onclick="setTimer(30)">30s</button>
       <button class="ft-q" onclick="setTimer(60)">1min</button>
       <button class="ft-q" onclick="setTimer(90)">1:30</button>
-      <button class="ft-go" onclick="toggleTimer()" id="ftBtn">▶</button>
+      <button class="ft-go" onclick="if(!notifyAsked){notifyAsked=true;requestNotifyPermission();}toggleTimer()" id="ftBtn">▶</button>
       <button class="ft-rst" onclick="resetTimer()">↺</button>
     </div>
   </div>
@@ -407,7 +469,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 
 <!-- HISTORY -->
 <div class="page" id="page-hist">
-  <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Histórico de Treinos</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Histórico de Treinos</div>
+    <button onclick="exportCSV()" style="background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:5px 10px;color:var(--muted);font-size:.7rem;cursor:pointer">📥 Exportar CSV</button>
+  </div>
   <div id="histList"></div>
 </div>
 
@@ -611,7 +676,26 @@ const ALL_EX = [];
 Object.values(TREINOS).forEach(t=>t.sections.forEach(s=>s.exercises.forEach(e=>ALL_EX.push(e))));
 
 // ── USERS & STATE ──
-const USERS = {u1:{name:'Rendell'},u2:{name:'Nego'}};
+// Load custom user names or use defaults
+function loadUserNames(){
+  return {
+    u1:{name:localStorage.getItem('mt5_name_u1')||'Rendell'},
+    u2:{name:localStorage.getItem('mt5_name_u2')||'Nego'}
+  };
+}
+let USERS = loadUserNames();
+
+function saveNames(){
+  const n1=document.getElementById('nameInpU1').value.trim();
+  const n2=document.getElementById('nameInpU2').value.trim();
+  if(n1){localStorage.setItem('mt5_name_u1',n1);USERS.u1.name=n1;}
+  if(n2){localStorage.setItem('mt5_name_u2',n2);USERS.u2.name=n2;}
+  document.getElementById('u1Label').textContent=USERS.u1.name;
+  document.getElementById('u2Label').textContent=USERS.u2.name;
+  document.getElementById('nameInpU1').value='';
+  document.getElementById('nameInpU2').value='';
+  showToast('✅ Nomes salvos!','success');
+}
 let curUser=null, curPin=null, pendingUid=null;
 let state={selectedTreino:null,cargas:{},cargaHistory:{},seriesDone:{},history:[]};
 let saveTO=null,unsub=null,applyingRemote=false,lastPushTs=null;
@@ -715,52 +799,129 @@ function pushCloud(now){
 function saveState(){if(!applyingRemote)pushCloud(false);}
 
 // ── TIMER (shared state) ──
-let tSec=60,tRun=false,tInt=null,tFull=60;
+// ── TIMER — timestamp-based so it survives Safari background ──
+let tFull=60, tRun=false, tInt=null;
+let tStartedAt=null;   // Date.now() when timer started
+let tSecsWhenStarted=60; // tSec value at start
 const TR_C=238.8, FT_C=119.4;
 
-function updateTimerUIs(){
-  const pct=tFull>0?tSec/tFull:0;
-  const lbl=tSec<=0?'✓':fmtTime(tSec);
-  const col=pct<=0.2?'#ef4444':'#f59e0b';
+function tSecsRemaining(){
+  if(!tRun||!tStartedAt) return tSecsWhenStarted;
+  const elapsed=Math.floor((Date.now()-tStartedAt)/1000);
+  return Math.max(0, tSecsWhenStarted-elapsed);
+}
 
-  // home ring
+function updateTimerUIs(){
+  const sec=tSecsRemaining();
+  const pct=tFull>0?sec/tFull:0;
+  const lbl=sec<=0?'✓':fmtTime(sec);
+  const col=pct<=0.2?'#ef4444':'#f59e0b';
+  const running=tRun&&sec>0;
+
   const r=document.getElementById('trRing');
   if(r){r.style.strokeDashoffset=TR_C*(1-pct);r.style.stroke=col;}
   const d=document.getElementById('trDisp');
-  if(d){d.textContent=lbl;d.className='tr-label'+(tSec<=0?' done':tRun?' running':'');}
+  if(d){d.textContent=lbl;d.className='tr-label'+(sec<=0?' done':running?' running':'');}
   const sb=document.getElementById('trBtn');
-  if(sb)sb.textContent=tRun?'⏸ Pausar':'▶ Iniciar';
+  if(sb)sb.textContent=running?'⏸ Pausar':'▶ Iniciar';
 
-  // float ring
   const fr=document.getElementById('ftRing');
   if(fr){fr.style.strokeDashoffset=FT_C*(1-pct);fr.style.stroke=col;}
   const fl=document.getElementById('ftRlbl');
-  if(fl)fl.textContent=tSec<=0?'✓':fmtTime(tSec);
+  if(fl)fl.textContent=sec<=0?'✓':fmtTime(sec);
   const fd=document.getElementById('ftDisp');
-  if(fd){fd.textContent=lbl;fd.className='ft-display'+(tSec<=0?' done':tRun?' running':'');}
+  if(fd){fd.textContent=lbl;fd.className='ft-display'+(sec<=0?' done':running?' running':'');}
   const fb=document.getElementById('ftBtn');
-  if(fb)fb.textContent=tRun?'⏸':'▶';
+  if(fb)fb.textContent=running?'⏸':'▶';
 }
 
-function fmtTime(s){return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
-function setTimer(s){stopTimer();tSec=s;tFull=s;updateTimerUIs();}
-function stopTimer(){clearInterval(tInt);tRun=false;}
-function toggleTimer(){
-  if(tRun){stopTimer();updateTimerUIs();return;}
-  if(tSec<=0)tSec=tFull;
-  tRun=true; updateTimerUIs();
+function fmtTime(s){return `${Math.floor(s/60)}:${String(Math.abs(s)%60).padStart(2,'0')}`;}
+
+function setTimer(s){
+  stopTimer();
+  tFull=s; tSecsWhenStarted=s; tStartedAt=null;
+  updateTimerUIs();
+}
+
+function stopTimer(){
+  clearInterval(tInt); tInt=null; tRun=false;
+  // freeze remaining seconds so next start resumes from here
+  tSecsWhenStarted=tSecsRemaining(); tStartedAt=null;
+}
+
+function startTimerTick(){
+  clearInterval(tInt);
   tInt=setInterval(()=>{
-    tSec--;
+    const sec=tSecsRemaining();
     updateTimerUIs();
-    if(tSec<=0){
+    if(sec<=0){
       stopTimer();
       showToast('⏰ Descansou! Próxima série!','success');
-      if(navigator.vibrate)navigator.vibrate([200,100,200]);
-      setTimeout(()=>{tSec=tFull;updateTimerUIs();},1200);
+      if(navigator.vibrate) navigator.vibrate([200,100,200]);
+      // send notification if app is in background
+      tryNotify('MeuTreino ⏰','Descansou! Hora da próxima série.');
+      setTimeout(()=>{tSecsWhenStarted=tFull;tStartedAt=null;updateTimerUIs();},1500);
     }
-  },1000);
+  },500); // 500ms tick = twice per second, keeps UI smooth
 }
-function resetTimer(){stopTimer();tSec=tFull;updateTimerUIs();}
+
+function toggleTimer(){
+  if(tRun){ stopTimer(); updateTimerUIs(); return; }
+  if(tSecsWhenStarted<=0) tSecsWhenStarted=tFull;
+  tRun=true;
+  tStartedAt=Date.now();
+  updateTimerUIs();
+  startTimerTick();
+}
+
+function resetTimer(){
+  stopTimer();
+  tSecsWhenStarted=tFull; tStartedAt=null;
+  updateTimerUIs();
+}
+function ftToggle(){toggleTimer();}
+function ftReset(){resetTimer();}
+
+// Resume timer correctly when page becomes visible again
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    if(tRun){
+      // restart interval tick (browser may have throttled/killed it)
+      const sec=tSecsRemaining();
+      if(sec<=0){
+        // already finished while in background
+        stopTimer();
+        showToast('⏰ Descansou! Próxima série!','success');
+        if(navigator.vibrate) navigator.vibrate([200,100,200]);
+        setTimeout(()=>{tSecsWhenStarted=tFull;tStartedAt=null;updateTimerUIs();},1200);
+      } else {
+        startTimerTick();
+        updateTimerUIs();
+      }
+    }
+  } else {
+    // page hidden — stop the JS interval (saves battery), timestamp persists
+    clearInterval(tInt); tInt=null;
+  }
+});
+
+// ── NOTIFICATIONS (for background timer) ──
+async function requestNotifyPermission(){
+  if(!('Notification' in window)) return;
+  if(Notification.permission==='default') await Notification.requestPermission();
+}
+function tryNotify(title,body){
+  if(!('Notification' in window)) return;
+  if(Notification.permission==='granted') new Notification(title,{body,icon:'https://em-content.zobj.net/source/apple/391/flexed-biceps_1f4aa.png'});
+}
+// Ask notification permission on first timer start
+let notifyAsked=false;
+const _realToggle=toggleTimer;
+// wrap toggleTimer to ask permission once
+window._timerPermWrap=function(){
+  if(!notifyAsked){notifyAsked=true;requestNotifyPermission();}
+  toggleTimer();
+};
 
 // ── TREINO SELECT ──
 function selectTreino(t){
@@ -801,7 +962,10 @@ function renderTreino(t){
   const hasHistory=tr.sections.some(s=>s.exercises.some(ex=>{const h=state.cargaHistory[ex.id];return h&&h.length>0;}));
 
   let html=`<div class="t-head" style="border-left-color:${col}">
-    <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Treino de hoje</div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Treino de hoje</div>
+      <button onclick="clearTodaySeries('${t}')" style="background:none;border:none;color:var(--muted);font-size:.65rem;cursor:pointer;padding:2px 6px;border-radius:5px;border:1px solid var(--border)">↺ Limpar séries</button>
+    </div>
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:800;color:${col}">${tr.name}</div>
     <div style="font-size:.75rem;color:var(--muted)">${tr.desc}</div>
     <div style="display:flex;justify-content:space-between;font-size:.65rem;margin-top:7px"><span style="color:var(--muted)">${doneS}/${totS} séries</span><span style="color:${col};font-weight:700">${pct}%</span></div>
@@ -1056,13 +1220,112 @@ function finalizarTreino(t){
   }));
   state.history=state.history.filter(h=>h.date!==today);
   const obsEl=document.getElementById('obs_geral');
-  state.history.unshift({date:today,treino:t,obs:obsEl?obsEl.value:'',timestamp:Date.now()});
+  state.history.unshift({date:today,treino:t,obs:obsEl?obsEl.value:'',vol:calcVol(t),timestamp:Date.now()});
   pushCloud(true);
-  showToast('🎉 Treino '+t+' finalizado!','success');
+  showFinishCelebration(t);
   renderHome(); renderCal(); renderHist(); renderPRs();
 }
 
+function calcVol(t){
+  const tr=TREINOS[t]; let vol=0;
+  tr.sections.forEach(s=>s.exercises.forEach(ex=>{
+    ex.series.forEach((_,i)=>{
+      const c=parseFloat(state.cargas[ex.id+'_s'+i])||0;
+      const r=typeof ex.series[i]==='number'?ex.series[i]:8;
+      vol+=c*r;
+    });
+  }));
+  return Math.round(vol);
+}
+
+function showFinishCelebration(t){
+  // popup
+  const col={A:'#3b82f6',B:'#ef4444',C:'#22c55e'}[t];
+  const popup=document.getElementById('finishPopup');
+  document.getElementById('fpTitle').textContent='Treino '+t+' Concluído! 🎉';
+  document.getElementById('fpSub').textContent='Ótimo trabalho! Continue assim 💪';
+  popup.style.borderColor=col;
+  popup.classList.add('show');
+  setTimeout(()=>popup.classList.remove('show'),3500);
+  // confetti
+  launchConfetti();
+}
+
+function launchConfetti(){
+  const canvas=document.getElementById('confettiCanvas');
+  canvas.style.display='block';
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const pieces=[];
+  const colors=['#f59e0b','#3b82f6','#22c55e','#ef4444','#a855f7','#fff'];
+  for(let i=0;i<120;i++){
+    pieces.push({
+      x:Math.random()*canvas.width, y:-10-Math.random()*200,
+      w:6+Math.random()*8, h:6+Math.random()*8,
+      r:Math.random()*Math.PI*2, dr:(.5-Math.random())*.15,
+      vx:(.5-Math.random())*3, vy:2+Math.random()*4,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      opacity:1
+    });
+  }
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.r);
+      ctx.globalAlpha=p.opacity;
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+      p.x+=p.vx; p.y+=p.vy; p.r+=p.dr; p.vy+=.07;
+      if(frame>80) p.opacity-=.018;
+    });
+    frame++;
+    if(frame<140) requestAnimationFrame(draw);
+    else canvas.style.display='none';
+  }
+  draw();
+}
+
 // ── HOME ──
+function suggestTreino(){
+  if(!state.history.length) return null;
+  const last=state.history[0];
+  const seq={A:'B',B:'C',C:'A'};
+  return {next:seq[last.treino]||'A', lastT:last.treino, lastDate:last.date};
+}
+
+function renderWeekCompare(){
+  const now=new Date();
+  const ws=new Date(now); ws.setDate(now.getDate()-now.getDay()); ws.setHours(0,0,0,0);
+  const lws=new Date(ws); lws.setDate(lws.getDate()-7);
+  const thisW=state.history.filter(h=>new Date(h.date+'T12:00:00')>=ws).length;
+  const lastW=state.history.filter(h=>{const d=new Date(h.date+'T12:00:00');return d>=lws&&d<ws;}).length;
+  const el=document.getElementById('weekCompareArea');
+  if(!thisW&&!lastW){el.innerHTML='';return;}
+  const maxW=Math.max(thisW,lastW,1);
+  const delta=thisW-lastW;
+  const deltaStr=delta>0?`+${delta} ↑`:delta<0?`${delta} ↓`:'= igual';
+  const deltaCol=delta>0?'var(--c)':delta<0?'var(--b)':'var(--muted)';
+  el.innerHTML=`<div class="week-compare">
+    <div class="wc-title">Comparativo semanal</div>
+    <div class="wc-row">
+      <div class="wc-lbl">Esta semana</div>
+      <div class="wc-bar-wrap"><div class="wc-bar" style="width:${Math.round(thisW/maxW*100)}%;background:var(--acc)"></div></div>
+      <div class="wc-val" style="color:var(--acc)">${thisW}</div>
+      <div class="wc-delta" style="color:${deltaCol}">${deltaStr}</div>
+    </div>
+    <div class="wc-row">
+      <div class="wc-lbl" style="color:var(--muted)">Semana passada</div>
+      <div class="wc-bar-wrap"><div class="wc-bar" style="width:${Math.round(lastW/maxW*100)}%;background:var(--muted)"></div></div>
+      <div class="wc-val" style="color:var(--muted)">${lastW}</div>
+      <div class="wc-delta"></div>
+    </div>
+  </div>`;
+}
+
 function renderHome(){
   const now=new Date();
   const days=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
@@ -1081,10 +1344,42 @@ function renderHome(){
     else break;
   }
   document.getElementById('stStreak').textContent=streak;
-  const ws=new Date(now); ws.setDate(now.getDate()-now.getDay()); ws.setHours(0,0,0,0);
-  document.getElementById('stWeek').textContent=state.history.filter(h=>new Date(h.date+'T12:00:00')>=ws).length;
+  const ws2=new Date(now); ws2.setDate(now.getDate()-now.getDay()); ws2.setHours(0,0,0,0);
+  const thisWeekCount=state.history.filter(h=>new Date(h.date+'T12:00:00')>=ws2).length;
+  document.getElementById('stWeek').textContent=thisWeekCount;
   document.getElementById('streakArea').innerHTML=streak>=2?`<div class="streak-chip">🔥 ${streak} dias seguidos!</div>`:'';
 
+  // Suggestion card
+  const sug=suggestTreino();
+  const sugEl=document.getElementById('suggestArea');
+  if(sug&&!state.selectedTreino){
+    const lastDate=sug.lastDate===todayStr()?'hoje':sug.lastDate===yesterdayStr()?'ontem':fmtDate(sug.lastDate);
+    sugEl.innerHTML=`<div class="suggest-card">
+      <div style="font-size:1.3rem">💡</div>
+      <div class="suggest-text">
+        <strong>Sugestão: Treino ${sug.next}</strong>
+        Você fez o Treino ${sug.lastT} ${lastDate}
+      </div>
+      <button class="suggest-btn" onclick="selectTreino('${sug.next}');document.getElementById('suggestArea').innerHTML=''">Escolher ${sug.next}</button>
+    </div>`;
+  } else { sugEl.innerHTML=''; }
+
+  // PWA hint (show once)
+  const pwaEl=document.getElementById('pwaHint');
+  const dismissed=localStorage.getItem('mt5_pwa_dismissed');
+  const isIOS=/iPhone|iPad/i.test(navigator.userAgent);
+  if(!dismissed&&isIOS){
+    pwaEl.innerHTML=`<div class="pwa-hint">
+      <div style="font-size:1.3rem;flex-shrink:0">📲</div>
+      <div class="pwa-hint-text">
+        <strong>Adicione à tela inicial!</strong>
+        Toque em <b>Compartilhar</b> → <b>Adicionar à Tela de Início</b> para usar como app sem a barra do Safari.
+      </div>
+      <button class="pwa-hint-close" onclick="localStorage.setItem('mt5_pwa_dismissed','1');this.closest('.pwa-hint').remove()">✕</button>
+    </div>`;
+  } else { pwaEl.innerHTML=''; }
+
+  renderWeekCompare();
   if(state.selectedTreino)selectTreino(state.selectedTreino);
   updateProg();
 }
@@ -1163,6 +1458,7 @@ function renderHist(){
     <div class="h-info">
       <div class="h-date">${fmtDate(h.date)}</div>
       <div class="h-name">${TREINOS[h.treino].name}</div>
+      ${h.vol?`<div class="h-vol">📊 Volume: ${h.vol.toLocaleString('pt-BR')}kg total</div>`:''}
       ${h.obs?`<div class="h-obs">${h.obs}</div>`:''}
     </div>
     <button class="h-del" onclick="delHist(${i})" title="Apagar">🗑</button>
@@ -1200,8 +1496,43 @@ function renderPRs(){
   }).join('');
 }
 
+// ── EXPORT CSV ──
+function exportCSV(){
+  if(!state.history.length){showToast('Nenhum treino para exportar');return;}
+  const rows=[['Data','Treino','Volume(kg)','Observações']];
+  state.history.forEach(h=>{
+    rows.push([h.date, TREINOS[h.treino].name, h.vol||'', (h.obs||'').replace(/,/g,' ')]);
+  });
+  // Add carga history
+  rows.push([]);
+  rows.push(['Exercício','Data','Carga Máxima(kg)']);
+  Object.entries(state.cargaHistory).forEach(([exId,hist])=>{
+    const ex=ALL_EX.find(e=>e.id===exId);
+    if(!ex)return;
+    hist.forEach(h=>rows.push([ex.name, h.date, h.max]));
+  });
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`meutreino_${curUser}_${todayStr()}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('📥 CSV exportado!','success');
+}
+
+// ── CLEAR TODAY SERIES ──
+function clearTodaySeries(t){
+  if(!confirm('Limpar todas as séries marcadas?')) return;
+  state.seriesDone={};
+  saveState();
+  renderTreino(t);
+  updateProg();
+  showToast('Séries limpas ↺');
+}
+
 // ── UTILS ──
 function todayStr(){const n=new Date();return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;}
+function yesterdayStr(){const n=new Date();n.setDate(n.getDate()-1);return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;}
 function fmtDate(s){if(!s)return '';const[y,m,d]=s.split('-');const mn=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];return `${d} ${mn[parseInt(m)-1]} ${y}`;}
 
 function showToast(msg,type=''){
@@ -1223,6 +1554,11 @@ function showTab(name){
 }
 
 // ── INIT ──
+// Set user labels from saved names
+document.getElementById('u1Label').textContent=USERS.u1.name;
+document.getElementById('u2Label').textContent=USERS.u2.name;
+document.getElementById('nameInpU1').placeholder=USERS.u1.name;
+document.getElementById('nameInpU2').placeholder=USERS.u2.name;
 if(!tryAuto())document.getElementById('userSelectScreen').style.display='flex';
 </script>
 </body>
