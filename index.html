@@ -149,9 +149,11 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .sec-line{flex:1;height:1px;background:var(--border)}
 
 /* exercise card */
-.ex-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;transition:border-color .2s}
-.ex-card.done-card{border-color:rgba(34,197,94,.35)}
-.ex-head{padding:13px 12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;user-select:none}
+.ex-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;transition:border-color .25s}
+.ex-card.done-card{border-color:rgba(34,197,94,.4);background:linear-gradient(135deg,var(--surf),rgba(34,197,94,.03))}
+.ex-card.done-card .ex-head{opacity:.8}
+.ex-head{padding:13px 12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.ex-head:active{background:rgba(255,255,255,.02)}
 .ex-img-wrap{width:48px;height:48px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
 .ex-photo-banner{width:100%;border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
 .ex-photo-banner-icon{font-size:2.2rem}
@@ -172,8 +174,12 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .ex-arr.open{transform:rotate(90deg)}
 
 /* series grid */
-.ex-body{display:none;border-top:1px solid var(--border);padding:10px 12px 12px}
+.ex-body{display:none;border-top:1px solid var(--border);padding:10px 12px 12px;animation:slideDown .18s ease}
 .ex-body.open{display:block}
+@keyframes slideDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.serie-dots{display:flex;gap:4px;margin-top:5px}
+.serie-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .25s,transform .2s}
+.serie-dot.done{background:var(--c);transform:scale(1.2)}
 
 /* serie rows — TWO LINE layout: info on top, carga controls below */
 .serie-item{padding:10px 0;border-bottom:1px solid rgba(37,45,61,.7)}
@@ -1015,6 +1021,7 @@ function renderTreino(t){
               ${pr?`<span class="tag pr-tag">🏆 ${pr}kg</span>`:''}
               <span class="sc-tag${allDone?' done':''}">${doneN}/${ex.series.length}</span>
             </div>
+            <div class="serie-dots">${ex.series.map((_,i)=>`<div class="serie-dot${state.seriesDone[ex.id+'_s'+i]?' done':''}" id="dot_${ex.id}_${i}"></div>`).join('')}</div>
             ${lc?`<div class="last-hint">Último: ${lc}kg</div>`:''}
           </div>
           <div class="ex-arr${autoOpen?' open':''}" id="arr_${ex.id}">›</div>
@@ -1199,28 +1206,63 @@ function toggleSerie(exId,si,t){
   state.seriesDone[key]=!state.seriesDone[key];
   const btn=document.getElementById('chk_'+exId+'_'+si);
   if(btn){btn.className='chk-btn'+(state.seriesDone[key]?' done':'');btn.textContent=state.seriesDone[key]?'✓':'';}
+
+  // haptic feedback
+  if(navigator.vibrate) navigator.vibrate(state.seriesDone[key]?[30]:[10,20,10]);
+
+  // update progress dot instantly
+  const dot=document.getElementById('dot_'+exId+'_'+si);
+  if(dot) dot.className='serie-dot'+(state.seriesDone[key]?' done':'');
+
   saveState(); updateProg();
 
-  // show inline rest counter when marking done (not when un-marking)
   if(state.seriesDone[key]) showRestInline(exId);
   else hideRestInline(exId);
 
-  // update card
   const tr=TREINOS[t];
+  let nextExId=null, foundCurrent=false;
+
   for(const sec of tr.sections){
-    const ex=sec.exercises.find(e=>e.id===exId);
-    if(ex){
-      const doneN=ex.series.filter((_,i)=>state.seriesDone[exId+'_s'+i]).length;
-      const allDone=doneN===ex.series.length;
-      const card=document.getElementById('card_'+exId);
-      if(card)card.className='ex-card'+(allDone?' done-card':'');
-      const nm=card?card.querySelector('.ex-name'):null;
-      if(nm)nm.textContent=ex.name+(allDone?' ✅':'');
-      const sc=card?card.querySelector('.sc-tag'):null;
-      if(sc){sc.textContent=doneN+'/'+ex.series.length;sc.className='sc-tag'+(allDone?' done':'');}
-      if(allDone){ hideRestInline(exId); showToast('✅ '+ex.name+' concluído!','success'); }
-      break;
+    for(const ex of sec.exercises){
+      if(foundCurrent&&!nextExId){
+        const n=ex.series.filter((_,i)=>state.seriesDone[ex.id+'_s'+i]).length;
+        if(n<ex.series.length) nextExId=ex.id;
+      }
+      if(ex.id===exId){
+        foundCurrent=true;
+        const doneN=ex.series.filter((_,i)=>state.seriesDone[exId+'_s'+i]).length;
+        const allDone=doneN===ex.series.length;
+        const card=document.getElementById('card_'+exId);
+        if(card) card.className='ex-card'+(allDone?' done-card':'');
+        const nm=card?card.querySelector('.ex-name'):null;
+        if(nm) nm.textContent=ex.name+(allDone?' ✅':'');
+        const sc=card?card.querySelector('.sc-tag'):null;
+        if(sc){sc.textContent=doneN+'/'+ex.series.length;sc.className='sc-tag'+(allDone?' done':'');}
+        if(allDone){
+          hideRestInline(exId);
+          setTimeout(()=>{
+            const body=document.getElementById('body_'+exId);
+            const arr=document.getElementById('arr_'+exId);
+            if(body) body.classList.remove('open');
+            if(arr) arr.classList.remove('open');
+          },400);
+          showToast('✅ '+ex.name+' concluído!','success');
+          if(navigator.vibrate) navigator.vibrate([50,30,100]);
+        }
+      }
     }
+  }
+
+  if(state.seriesDone[key]&&nextExId){
+    setTimeout(()=>{
+      const nb=document.getElementById('body_'+nextExId);
+      const na=document.getElementById('arr_'+nextExId);
+      if(nb&&!nb.classList.contains('open')){
+        nb.classList.add('open'); if(na) na.classList.add('open');
+        const nc=document.getElementById('card_'+nextExId);
+        if(nc) nc.scrollIntoView({behavior:'smooth',block:'nearest'});
+      }
+    },750);
   }
 }
 
