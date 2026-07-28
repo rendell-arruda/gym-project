@@ -329,6 +329,16 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 /* share button */
 .share-btn{width:100%;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--surf2);color:var(--text);font-size:.9rem;font-weight:700;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px}
 .share-btn:active{background:var(--border)}
+/* finish reminder */
+@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.finish-reminder{position:fixed;bottom:calc(70px + var(--safe-bottom));left:12px;right:12px;z-index:500;background:linear-gradient(135deg,#0e1f0e,#122012);border:2px solid var(--c);border-radius:14px;padding:14px 16px;display:none;box-shadow:0 8px 32px rgba(34,197,94,.25)}
+.finish-reminder.show{display:flex;align-items:center;gap:12px;animation:slideUp .3s ease}
+.fr-icon{font-size:1.8rem;flex-shrink:0}
+.fr-text{flex:1}
+.fr-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;color:var(--c)}
+.fr-sub{font-size:.7rem;color:rgba(34,197,94,.65);margin-top:1px}
+.fr-btn{background:var(--c);color:#000;border:none;border-radius:8px;padding:10px 14px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;flex-shrink:0}
+.fr-close{background:none;border:none;color:rgba(34,197,94,.4);font-size:1.1rem;cursor:pointer;padding:0 4px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -337,6 +347,15 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
   <div class="fp-icon">🏆</div>
   <div class="fp-title" id="fpTitle">Treino Concluído!</div>
   <div class="fp-sub" id="fpSub">Ótimo trabalho!</div>
+</div>
+<div class="finish-reminder" id="finishReminder">
+  <div class="fr-icon">🏁</div>
+  <div class="fr-text">
+    <div class="fr-title">Treino completo!</div>
+    <div class="fr-sub">Não esqueça de finalizar para salvar no histórico</div>
+  </div>
+  <button class="fr-btn" id="frBtn" onclick="">FINALIZAR</button>
+  <button class="fr-close" onclick="document.getElementById('finishReminder').classList.remove('show')">✕</button>
 </div>
 
 <!-- USER SELECT -->
@@ -1147,14 +1166,13 @@ function saveTreinoObs(val){
 let restInterval=null, restExId=null;
 
 function showRestInline(exId){
-  // hide any existing rest
   if(restExId&&restExId!==exId) hideRestInline(restExId);
   restExId=exId;
   const el=document.getElementById('rest_'+exId);
   if(!el)return;
   el.classList.add('show');
-  // sync with main timer
-  let s=tSec>0?tSec:60;
+  // use tSecsRemaining() instead of old tSec
+  let s=tSecsRemaining()>0?tSecsRemaining():tFull;
   clearInterval(restInterval);
   restInterval=setInterval(()=>{
     s--;
@@ -1174,7 +1192,7 @@ function hideRestInline(exId){
 }
 function skipRest(exId){
   hideRestInline(exId);
-  stopTimer(); tSec=tFull; updateTimerUIs();
+  stopTimer(); tSecsWhenStarted=tFull; tStartedAt=null; updateTimerUIs();
 }
 
 function repeatLastWorkout(t){
@@ -1240,30 +1258,40 @@ function toggleSerie(exId,si,t){
         if(sc){sc.textContent=doneN+'/'+ex.series.length;sc.className='sc-tag'+(allDone?' done':'');}
         if(allDone){
           hideRestInline(exId);
-          setTimeout(()=>{
-            const body=document.getElementById('body_'+exId);
-            const arr=document.getElementById('arr_'+exId);
-            if(body) body.classList.remove('open');
-            if(arr) arr.classList.remove('open');
-          },400);
+          // close card immediately
+          const body=document.getElementById('body_'+exId);
+          const arr=document.getElementById('arr_'+exId);
+          if(body) body.classList.remove('open');
+          if(arr) arr.classList.remove('open');
           showToast('✅ '+ex.name+' concluído!','success');
           if(navigator.vibrate) navigator.vibrate([50,30,100]);
+
+          // open next incomplete exercise without scrolling
+          if(nextExId){
+            setTimeout(()=>{
+              const nb=document.getElementById('body_'+nextExId);
+              const na=document.getElementById('arr_'+nextExId);
+              if(nb&&!nb.classList.contains('open')){
+                nb.classList.add('open');
+                if(na) na.classList.add('open');
+              }
+            }, 500);
+          }
+
+          // check if ALL exercises done → show finish reminder
+          setTimeout(()=>{
+            const allExDone=tr.sections.every(s=>s.exercises.every(e=>
+              e.series.every((_,i)=>state.seriesDone[e.id+'_s'+i])
+            ));
+            if(allExDone) showFinishReminder(t);
+          }, 800);
         }
       }
     }
   }
 
-  if(state.seriesDone[key]&&nextExId){
-    setTimeout(()=>{
-      const nb=document.getElementById('body_'+nextExId);
-      const na=document.getElementById('arr_'+nextExId);
-      if(nb&&!nb.classList.contains('open')){
-        nb.classList.add('open'); if(na) na.classList.add('open');
-        const nc=document.getElementById('card_'+nextExId);
-        if(nc) nc.scrollIntoView({behavior:'smooth',block:'nearest'});
-      }
-    },750);
-  }
+  // Only open next exercise when the current one is fully done
+  // (nextExId is set inside the allDone block below when needed)
 }
 
 function finalizarTreino(t){
@@ -1652,6 +1680,23 @@ function calcBestStreak(){
     else cur=1;
   }
   return best;
+}
+
+function showFinishReminder(t){
+  const rem=document.getElementById('finishReminder');
+  const btn=document.getElementById('frBtn');
+  if(!rem) return;
+  // wire the button to the right treino
+  btn.onclick=()=>{
+    rem.classList.remove('show');
+    finalizarTreino(t);
+  };
+  rem.classList.add('show');
+  if(navigator.vibrate) navigator.vibrate([100,50,100,50,200]);
+  // also try a notification if app is in background
+  tryNotify('MeuTreino 🏁','Treino completo! Não esqueça de finalizar.');
+  // auto-hide after 30s so it doesn't block the screen forever
+  setTimeout(()=>rem.classList.remove('show'), 30000);
 }
 
 // ── EXPORT CSV ──
