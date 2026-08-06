@@ -27,6 +27,24 @@
   window.firebaseReady = true;
   window.dispatchEvent(new Event('firebase-ready'));
 </script>
+<script>
+// Wake Lock — keep screen on while on treino tab
+let wakeLock = null;
+async function requestWakeLock() {
+  if ('wakeLock' in navigator) {
+    try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+  }
+}
+async function releaseWakeLock() {
+  if (wakeLock) { try { await wakeLock.release(); wakeLock = null; } catch(e) {} }
+}
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && wakeLock === null) {
+    const treinoActive = document.getElementById('page-treino')?.classList.contains('active');
+    if (treinoActive) await requestWakeLock();
+  }
+});
+</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap');
 :root {
@@ -339,10 +357,66 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .fr-sub{font-size:.7rem;color:rgba(34,197,94,.65);margin-top:1px}
 .fr-btn{background:var(--c);color:#000;border:none;border-radius:8px;padding:10px 14px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;flex-shrink:0}
 .fr-close{background:none;border:none;color:rgba(34,197,94,.4);font-size:1.1rem;cursor:pointer;padding:0 4px;flex-shrink:0}
+
+/* theme toggle */
+body.light{--bg:#f0f4f8;--surf:#fff;--surf2:#e8edf3;--border:#d1d9e6;--text:#1e2330;--muted:#64748b}
+body.light nav{background:rgba(240,244,248,.96)}
+body.light .tabs{background:#f0f4f8}
+.theme-btn{background:none;border:1px solid var(--border);border-radius:20px;padding:4px 10px;color:var(--muted);font-size:.75rem;cursor:pointer}
+
+/* font size control */
+body.font-lg{font-size:18px}
+body.font-lg .ex-name{font-size:1rem}
+body.font-lg .serie-item{padding:12px 0}
+
+/* onboarding */
+.onboard{position:fixed;inset:0;background:var(--bg);z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center}
+.onboard-icon{font-size:4rem;margin-bottom:16px}
+.onboard-title{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;margin-bottom:8px}
+.onboard-sub{color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:28px;max-width:300px}
+.onboard-btn{background:var(--acc);color:#000;border:none;border-radius:12px;padding:14px 32px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px}
+.onboard-skip{background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;margin-top:14px;text-decoration:underline}
+.onboard-steps{display:flex;gap:8px;margin-bottom:28px}
+.onboard-step{width:8px;height:8px;border-radius:50%;background:var(--border)}
+.onboard-step.active{background:var(--acc);width:20px;border-radius:20px}
+
+/* 1RM badge */
+.orm-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:2px 8px;font-size:.6rem;font-weight:700;color:#a855f7}
+
+/* monthly volume card */
+.month-vol{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:14px}
+.mv-title{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.mv-num{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;color:var(--acc);line-height:1}
+.mv-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+.mv-bar-wrap{display:flex;gap:3px;align-items:flex-end;height:40px;margin-top:10px}
+.mv-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;justify-content:flex-end;height:100%}
+.mv-bar{width:100%;border-radius:3px 3px 0 0;background:var(--acc);opacity:.6;min-height:3px}
+.mv-bar-lbl{font-size:.45rem;color:var(--muted)}
+
+/* settings page */
+.settings-section{margin-bottom:20px}
+.settings-title{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surf);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px}
+.settings-row-label{font-size:.88rem;font-weight:600}
+.settings-row-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--surf2);border-radius:24px;cursor:pointer;transition:.3s;border:1px solid var(--border)}
+.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.3s}
+input:checked+.toggle-slider{background:var(--acc)}
+input:checked+.toggle-slider:before{transform:translateX(20px);background:#000}
+.font-size-btns{display:flex;gap:6px}
+.fs-btn{background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:5px 12px;color:var(--text);font-size:.85rem;cursor:pointer}
+.fs-btn.active{background:var(--acc);color:#000;border-color:var(--acc)}
 </style>
 </head>
 <body>
 <canvas id="confettiCanvas"></canvas>
+
+<!-- Onboarding -->
+<div class="onboard" id="onboard" style="display:none">
+  <div id="onboardContent"></div>
+</div>
 <div class="finish-popup" id="finishPopup">
   <div class="fp-icon">🏆</div>
   <div class="fp-title" id="fpTitle">Treino Concluído!</div>
@@ -406,6 +480,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
   <button class="tab-btn" onclick="showTab('cal')"><span class="tab-icon">📅</span>Calendário</button>
   <button class="tab-btn" onclick="showTab('hist')"><span class="tab-icon">📋</span>Histórico</button>
   <button class="tab-btn" onclick="showTab('prs')"><span class="tab-icon">🏆</span>PRs</button>
+  <button class="tab-btn" onclick="showTab('settings')"><span class="tab-icon">⚙️</span>Config</button>
 </div>
 
 <!-- HOME -->
@@ -441,6 +516,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
     <div class="stat-box"><div class="stat-n" id="stBest">0</div><div class="stat-l">🥇 Recorde</div></div>
   </div>
   <div id="weekCompareArea"></div>
+  <div id="monthVolArea"></div>
 
   <div class="timer-box">
     <div class="timer-label">⏱ Timer de Descanso</div>
@@ -523,6 +599,56 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 <div class="page" id="page-prs">
   <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">🏆 Recordes Pessoais</div>
   <div id="prsList"></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="page" id="page-settings">
+  <div class="settings-section">
+    <div class="settings-title">Aparência</div>
+    <div class="settings-row">
+      <div><div class="settings-row-label">🌙 Tema Escuro</div><div class="settings-row-sub">Alternar entre escuro e claro</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="themeToggle" onchange="toggleTheme(this.checked)"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-row-label">🔤 Tamanho da fonte</div><div class="settings-row-sub">Ajustar legibilidade</div></div>
+      <div class="font-size-btns">
+        <button class="fs-btn" id="fsSmall" onclick="setFontSize('normal')">A</button>
+        <button class="fs-btn active" id="fsLarge" onclick="setFontSize('lg')">A+</button>
+      </div>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-title">Treino</div>
+    <div class="settings-row">
+      <div><div class="settings-row-label">📱 Tela sempre ligada</div><div class="settings-row-sub">Evita apagar durante o treino</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="wakeLockToggle" checked onchange="setWakeLockPref(this.checked)"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-row-label">📳 Vibração háptica</div><div class="settings-row-sub">Feedback ao marcar séries</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="hapticToggle" checked onchange="setHapticPref(this.checked)"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-title">Dados</div>
+    <div class="settings-row" style="cursor:pointer" onclick="exportCSV()">
+      <div><div class="settings-row-label">📥 Exportar histórico CSV</div><div class="settings-row-sub">Baixar todos os seus treinos</div></div>
+      <span style="color:var(--muted)">›</span>
+    </div>
+    <div class="settings-row" style="cursor:pointer" onclick="backupNow()">
+      <div><div class="settings-row-label">☁️ Backup manual agora</div><div class="settings-row-sub">Salvar snapshot no Firestore</div></div>
+      <span style="color:var(--muted)">›</span>
+    </div>
+    <div class="settings-row" style="cursor:pointer" onclick="if(confirm('Apagar TODOS os dados locais? Os dados do Firestore permanecem.'))clearLocalData()">
+      <div><div class="settings-row-label" style="color:var(--b)">🗑 Limpar dados locais</div><div class="settings-row-sub">Mantém backup na nuvem</div></div>
+      <span style="color:var(--muted)">›</span>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-title">Sobre</div>
+    <div class="settings-row">
+      <div><div class="settings-row-label">MeuTreino</div><div class="settings-row-sub">Versão 2.0 · Feito com 💪 e Claude</div></div>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -900,7 +1026,7 @@ function startTimerTick(){
     if(sec<=0){
       stopTimer();
       showToast('⏰ Descansou! Próxima série!','success');
-      if(navigator.vibrate) navigator.vibrate([200,100,200]);
+      haptic([200,100,200]);
       // send notification if app is in background
       tryNotify('MeuTreino ⏰','Descansou! Hora da próxima série.');
       setTimeout(()=>{tSecsWhenStarted=tFull;tStartedAt=null;updateTimerUIs();},1500);
@@ -935,7 +1061,7 @@ document.addEventListener('visibilitychange',()=>{
         // already finished while in background
         stopTimer();
         showToast('⏰ Descansou! Próxima série!','success');
-        if(navigator.vibrate) navigator.vibrate([200,100,200]);
+        haptic([200,100,200]);
         setTimeout(()=>{tSecsWhenStarted=tFull;tStartedAt=null;updateTimerUIs();},1200);
       } else {
         startTimerTick();
@@ -1226,7 +1352,7 @@ function toggleSerie(exId,si,t){
   if(btn){btn.className='chk-btn'+(state.seriesDone[key]?' done':'');btn.textContent=state.seriesDone[key]?'✓':'';}
 
   // haptic feedback
-  if(navigator.vibrate) navigator.vibrate(state.seriesDone[key]?[30]:[10,20,10]);
+  haptic(state.seriesDone[key]?[30]:[10,20,10]);
 
   // update progress dot instantly
   const dot=document.getElementById('dot_'+exId+'_'+si);
@@ -1264,7 +1390,7 @@ function toggleSerie(exId,si,t){
           if(body) body.classList.remove('open');
           if(arr) arr.classList.remove('open');
           showToast('✅ '+ex.name+' concluído!','success');
-          if(navigator.vibrate) navigator.vibrate([50,30,100]);
+          haptic([50,30,100]);
 
           // open next incomplete exercise without scrolling
           if(nextExId){
@@ -1473,6 +1599,7 @@ function renderHome(){
   } else { pwaEl.innerHTML=''; }
 
   renderWeekCompare();
+  renderMonthVolume();
   if(state.selectedTreino)selectTreino(state.selectedTreino);
   updateProg();
 }
@@ -1589,6 +1716,114 @@ function renderPRs(){
   }).join('');
 }
 
+// ── SETTINGS ──
+function toggleTheme(isDark){
+  document.body.classList.toggle('light', !isDark);
+  localStorage.setItem('mt5_theme', isDark?'dark':'light');
+}
+function setFontSize(size){
+  document.body.classList.toggle('font-lg', size==='lg');
+  localStorage.setItem('mt5_fontsize', size);
+  document.getElementById('fsSmall').classList.toggle('active', size==='normal');
+  document.getElementById('fsLarge').classList.toggle('active', size==='lg');
+}
+let wakeLockEnabled=true, hapticEnabled=true;
+function setWakeLockPref(v){ wakeLockEnabled=v; localStorage.setItem('mt5_wakelock',v?'1':'0'); if(!v) releaseWakeLock(); }
+function setHapticPref(v){ hapticEnabled=v; localStorage.setItem('mt5_haptic',v?'1':'0'); }
+function haptic(pattern){ if(hapticEnabled&&navigator.vibrate) navigator.vibrate(pattern); }
+function backupNow(){
+  if(!curPin){showToast('Faça login primeiro');return;}
+  pushCloud(true);
+  showToast('☁️ Backup salvo!','success');
+}
+function clearLocalData(){
+  if(curPin) localStorage.removeItem('mt5_'+curPin);
+  showToast('Dados locais limpos');
+}
+function loadSettings(){
+  const theme=localStorage.getItem('mt5_theme')||'dark';
+  const fs=localStorage.getItem('mt5_fontsize')||'lg';
+  const wl=localStorage.getItem('mt5_wakelock');
+  const hap=localStorage.getItem('mt5_haptic');
+  if(theme==='light'){document.body.classList.add('light');const t=document.getElementById('themeToggle');if(t)t.checked=false;}
+  setFontSize(fs);
+  wakeLockEnabled=wl!=='0'; hapticEnabled=hap!=='0';
+  const wlt=document.getElementById('wakeLockToggle'); if(wlt) wlt.checked=wakeLockEnabled;
+  const hapt=document.getElementById('hapticToggle'); if(hapt) hapt.checked=hapticEnabled;
+}
+
+// ── ONBOARDING ──
+const ONBOARD_STEPS=[
+  {icon:'💪',title:'Bem-vindo ao MeuTreino!',sub:'Acompanhe seus treinos, cargas e evolução em um só lugar.'},
+  {icon:'📊',title:'Registre suas cargas',sub:'Abra cada exercício, preencha o peso e marque as séries conforme completa.'},
+  {icon:'⏱',title:'Timer de descanso',sub:'Use o timer flutuante para cronometrar o descanso entre séries. Ele funciona mesmo com o app em segundo plano.'},
+  {icon:'🏆',title:'Acompanhe seus PRs',sub:'Ao finalizar o treino, seus recordes são salvos automaticamente na aba PRs.'},
+  {icon:'☁️',title:'Sincronização automática',sub:'Seus dados ficam salvos na nuvem. Acesse de qualquer dispositivo com seu PIN.'},
+];
+let onboardStep=0;
+function showOnboard(){
+  const el=document.getElementById('onboard');
+  if(!el)return;
+  el.style.display='flex';
+  renderOnboardStep();
+}
+function renderOnboardStep(){
+  const s=ONBOARD_STEPS[onboardStep];
+  const isLast=onboardStep===ONBOARD_STEPS.length-1;
+  document.getElementById('onboardContent').innerHTML=`
+    <div class="onboard-icon">${s.icon}</div>
+    <div class="onboard-title">${s.title}</div>
+    <div class="onboard-sub">${s.sub}</div>
+    <div class="onboard-steps">${ONBOARD_STEPS.map((_,i)=>`<div class="onboard-step${i===onboardStep?' active':''}"></div>`).join('')}</div>
+    <button class="onboard-btn" onclick="nextOnboard()">${isLast?'Começar! 🚀':'Próximo →'}</button>
+    ${!isLast?`<button class="onboard-skip" onclick="closeOnboard()">Pular introdução</button>`:''}
+  `;
+}
+function nextOnboard(){
+  if(onboardStep<ONBOARD_STEPS.length-1){onboardStep++;renderOnboardStep();}
+  else closeOnboard();
+}
+function closeOnboard(){
+  document.getElementById('onboard').style.display='none';
+  localStorage.setItem('mt5_onboarded','1');
+}
+
+// ── MONTHLY VOLUME ──
+function renderMonthVolume(){
+  const el=document.getElementById('monthVolArea');
+  if(!el)return;
+  if(!state.history.length){el.innerHTML='';return;}
+  const now=new Date();
+  // last 6 months
+  const months=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][d.getMonth()];
+    const vol=state.history.filter(h=>h.date.startsWith(key)).reduce((s,h)=>s+(h.vol||0),0);
+    const count=state.history.filter(h=>h.date.startsWith(key)).length;
+    months.push({key,label,vol,count});
+  }
+  const curMonth=months[months.length-1];
+  const maxVol=Math.max(...months.map(m=>m.vol),1);
+  const bars=months.map(m=>`<div class="mv-bar-col">
+    <div class="mv-bar" style="height:${Math.round(m.vol/maxVol*100)}%;opacity:${m.key===curMonth.key?1:.5}"></div>
+    <div class="mv-bar-lbl">${m.label}</div>
+  </div>`).join('');
+  el.innerHTML=`<div class="month-vol">
+    <div class="mv-title">Volume mensal acumulado</div>
+    <div class="mv-num">${(curMonth.vol/1000).toFixed(1)}t</div>
+    <div class="mv-sub">${curMonth.count} treinos em ${curMonth.label} · ${curMonth.vol.toLocaleString('pt-BR')}kg total</div>
+    <div class="mv-bar-wrap">${bars}</div>
+  </div>`;
+}
+
+// ── 1RM CALCULATOR (Epley formula) ──
+function calc1RM(weight, reps){
+  if(reps===1) return weight;
+  return Math.round(weight*(1+reps/30));
+}
+
 // ── STOPWATCH (workout duration) ──
 let swStartedAt=null, swElapsed=0, swRunning=false, swInt=null;
 
@@ -1692,7 +1927,7 @@ function showFinishReminder(t){
     finalizarTreino(t);
   };
   rem.classList.add('show');
-  if(navigator.vibrate) navigator.vibrate([100,50,100,50,200]);
+  haptic([100,50,100,50,200]);
   // also try a notification if app is in background
   tryNotify('MeuTreino 🏁','Treino completo! Não esqueça de finalizar.');
   // auto-hide after 30s so it doesn't block the screen forever
@@ -1748,21 +1983,31 @@ function showTab(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  const tabs=['home','treino','cal','hist','prs'];
+  const tabs=['home','treino','cal','hist','prs','settings'];
   document.querySelectorAll('.tab-btn')[tabs.indexOf(name)].classList.add('active');
   if(name==='treino'&&state.selectedTreino)renderTreino(state.selectedTreino);
   if(name==='cal')renderCal();
   if(name==='hist')renderHist();
   if(name==='prs')renderPRs();
+  if(name==='settings')loadSettings();
+  // wake lock: on when treino, off otherwise
+  if(name==='treino'&&wakeLockEnabled) requestWakeLock();
+  else releaseWakeLock();
 }
 
 // ── INIT ──
-// Set user labels from saved names
+loadSettings();
 document.getElementById('u1Label').textContent=USERS.u1.name;
 document.getElementById('u2Label').textContent=USERS.u2.name;
 document.getElementById('nameInpU1').placeholder=USERS.u1.name;
 document.getElementById('nameInpU2').placeholder=USERS.u2.name;
-if(!tryAuto())document.getElementById('userSelectScreen').style.display='flex';
+if(!tryAuto()) document.getElementById('userSelectScreen').style.display='flex';
+// Show onboarding for new users (after login)
+const _origDoLogin = doLogin;
+window.doLogin = function(uid, pin){
+  _origDoLogin(uid, pin);
+  if(!localStorage.getItem('mt5_onboarded')) setTimeout(showOnboard, 600);
+};
 </script>
 </body>
 </html>
