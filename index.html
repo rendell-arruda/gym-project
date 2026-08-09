@@ -1575,15 +1575,45 @@ function renderHome(){
   // Suggestion card
   const sug=suggestTreino();
   const sugEl=document.getElementById('suggestArea');
-  if(sug&&!state.selectedTreino){
+  if(sug){
     const lastDate=sug.lastDate===todayStr()?'hoje':sug.lastDate===yesterdayStr()?'ontem':fmtDate(sug.lastDate);
-    sugEl.innerHTML=`<div class="suggest-card">
-      <div style="font-size:1.3rem">💡</div>
-      <div class="suggest-text">
-        <strong>Sugestão: Treino ${sug.next}</strong>
-        Você fez o Treino ${sug.lastT} ${lastDate}
+    const lastColor={A:'#3b82f6',B:'#ef4444',C:'#22c55e'}[sug.lastT]||'var(--muted)';
+    const nextColor={A:'#3b82f6',B:'#ef4444',C:'#22c55e'}[sug.next]||'var(--acc)';
+    const lastDesc={A:'Costas + Bíceps',B:'Peito + Tríceps',C:'Ombro + Abdômen'}[sug.lastT];
+    const nextDesc={A:'Costas + Bíceps',B:'Peito + Tríceps',C:'Ombro + Abdômen'}[sug.next];
+    const alreadySelected=state.selectedTreino===sug.next;
+
+    sugEl.innerHTML=`<div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px">
+      <!-- último treino -->
+      <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Último treino</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:${lastColor}12;border:1px solid ${lastColor}30;border-radius:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;border-radius:8px;background:${lastColor}22;color:${lastColor};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;flex-shrink:0">${sug.lastT}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:.88rem;color:${lastColor}">Treino ${sug.lastT}</div>
+          <div style="font-size:.72rem;color:var(--muted)">${lastDesc} · ${lastDate}</div>
+        </div>
+        <div style="font-size:1.2rem">✅</div>
       </div>
-      <button class="suggest-btn" onclick="selectTreino('${sug.next}');document.getElementById('suggestArea').innerHTML=''">Escolher ${sug.next}</button>
+      <!-- sugestão -->
+      <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Sugestão para hoje</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1;padding:10px;background:${nextColor}12;border:1px solid ${nextColor}30;border-radius:10px;display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:8px;background:${nextColor}22;color:${nextColor};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;flex-shrink:0">${sug.next}</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem;color:${nextColor}">Treino ${sug.next}</div>
+            <div style="font-size:.72rem;color:var(--muted)">${nextDesc}</div>
+          </div>
+        </div>
+        ${!alreadySelected?`<button onclick="selectTreino('${sug.next}')" style="background:${nextColor};color:${sug.next==='C'?'#000':'#fff'};border:none;border-radius:9px;padding:10px 14px;font-weight:800;font-size:.82rem;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;white-space:nowrap;flex-shrink:0">Selecionar ${sug.next}</button>`
+        :`<div style="color:var(--c);font-size:1.2rem;padding:0 8px">✓</div>`}
+      </div>
+    </div>`;
+  } else if(!state.history.length){
+    // first time — welcome message
+    sugEl.innerHTML=`<div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;text-align:center">
+      <div style="font-size:1.8rem;margin-bottom:6px">👋</div>
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:4px">Primeiro treino!</div>
+      <div style="font-size:.75rem;color:var(--muted)">Escolha um treino acima e comece hoje.</div>
     </div>`;
   } else { sugEl.innerHTML=''; }
 
