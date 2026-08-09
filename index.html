@@ -348,6 +348,27 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .share-btn{width:100%;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--surf2);color:var(--text);font-size:.9rem;font-weight:700;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px}
 .share-btn:active{background:var(--border)}
 /* finish reminder */
+/* cardio section */
+.cardio-card{background:linear-gradient(135deg,rgba(251,146,60,.08),rgba(251,146,60,.02));border:1px solid rgba(251,146,60,.3);border-radius:var(--r);padding:16px;margin-top:14px}
+.cardio-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.cardio-icon{font-size:1.6rem}
+.cardio-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;color:#fb923c}
+.cardio-sub{font-size:.7rem;color:var(--muted);margin-top:1px}
+.cardio-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.cardio-field label{display:block;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-weight:600}
+.cardio-inp{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:16px;font-weight:700;padding:10px 8px;text-align:center;font-family:'Inter',sans-serif;-webkit-appearance:none}
+.cardio-inp:focus{outline:none;border-color:#fb923c}
+.cardio-row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.cardio-preset{background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:.72rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.cardio-preset:active{background:rgba(251,146,60,.15);border-color:#fb923c}
+.cardio-done-btn{width:100%;padding:11px;border-radius:9px;border:none;background:#fb923c;color:#fff;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:8px}
+.cardio-done-btn.done{background:rgba(34,197,94,.15);border:1px solid var(--c);color:var(--c)}
+.cardio-saved{font-size:.72rem;color:var(--c);margin-top:6px;text-align:center;display:none}
+.cardio-saved.show{display:block}
+.cardio-hist{margin-top:10px;padding-top:10px;border-top:1px solid rgba(251,146,60,.15)}
+.cardio-hist-title{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.cardio-hist-item{display:flex;justify-content:space-between;font-size:.72rem;padding:3px 0;color:var(--muted)}
+.cardio-hist-item span:last-child{color:var(--text);font-weight:600}
 @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
 .finish-reminder{position:fixed;bottom:calc(70px + var(--safe-bottom));left:12px;right:12px;z-index:500;background:linear-gradient(135deg,#0e1f0e,#122012);border:2px solid var(--c);border-radius:14px;padding:14px 16px;display:none;box-shadow:0 8px 32px rgba(34,197,94,.25)}
 .finish-reminder.show{display:flex;align-items:center;gap:12px;animation:slideUp .3s ease}
@@ -805,7 +826,7 @@ const TREINOS = {
         {id:'A8',name:'Rosca Alternada Sentado',series:[10,8,6,6]},
         {id:'A9',name:'Rosca Unilateral Polia',series:[10,8,6,6]},
       ]},
-    ], finalizacao:'Escada → 5 min a 7-8km/h'},
+    ], finalizacao:'Escada → 5 min a 7-8km/h', cardio:{tipo:'escada',sugestao:'5 min · 7-8 km/h'}},
   B:{ name:'Treino B', color:'#ef4444', desc:'Peito + Tríceps + Perna + Escada',
     sections:[
       {name:'PERNA',exercises:[
@@ -824,7 +845,7 @@ const TREINOS = {
         {id:'B9',name:'Tríceps Corda Polia',series:[12,10,8,8]},
         {id:'B10',name:'Coice Unilateral Polia',series:[12,10,8,8]},
       ]},
-    ], finalizacao:'Escada → 5 minutos'},
+    ], finalizacao:'Escada → 5 minutos', cardio:{tipo:'escada',sugestao:'5 min · 7-8 km/h'}},
   C:{ name:'Treino C', color:'#22c55e', desc:'Ombro + Abdômen + Perna',
     sections:[
       {name:'PERNA',exercises:[
@@ -839,7 +860,7 @@ const TREINOS = {
         {id:'C7',name:'Elevação Lateral Polia',series:[15,12,10,10],note:'🔁 SEM DESCANSO → Abdômen na polia 15 reps',nosdescanso:true},
         {id:'C8',name:'Posterior de Ombro',series:[10,8,8,6],note:'🔁 SEM DESCANSO → Abdômen na polia 15 reps',nosdescanso:true},
       ]},
-    ], finalizacao:null},
+    ], finalizacao:'Escada → 5 minutos', cardio:{tipo:'escada',sugestao:'5 min · 7-8 km/h'}},
 };
 const ALL_EX = [];
 Object.values(TREINOS).forEach(t=>t.sections.forEach(s=>s.exercises.forEach(e=>ALL_EX.push(e))));
@@ -1210,7 +1231,7 @@ function renderTreino(t){
     });
   });
 
-  if(tr.finalizacao) html+=`<div class="final-chip"><div style="font-size:1.5rem">🏃</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;color:var(--acc)">Finalização</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">${tr.finalizacao}</div></div>`;
+  if(tr.cardio) html += renderCardioSection(tr.cardio, t);
 
   const obs=getTodayObs();
   html+=`<div style="margin-top:14px">
@@ -1221,6 +1242,101 @@ function renderTreino(t){
   <button class="fin-btn" style="background:${col};color:${t==='C'?'#000':'#fff'}" onclick="finalizarTreino('${t}')">FINALIZAR TREINO ${t} 🏁</button>`;
 
   document.getElementById('treinoContent').innerHTML=html;
+}
+
+function renderCardioSection(cardio, t){
+  const today = todayStr();
+  const savedKey = 'cardio_'+t+'_'+today;
+  const saved = state.cargas[savedKey] || null;
+  const hist = (state.cargaHistory['cardio_'+t] || []).slice(-3).reverse();
+  const isDone = !!saved;
+
+  const histHtml = hist.length ? `<div class="cardio-hist">
+    <div class="cardio-hist-title">Últimas sessões</div>
+    ${hist.map(h=>{
+      const d=h.date.split('-');
+      return `<div class="cardio-hist-item"><span>${d[2]}/${d[1]}</span><span>${h.tempo||'—'} min · ${h.vel||'—'} km/h · ${h.dist||'—'} km</span></div>`;
+    }).join('')}
+  </div>` : '';
+
+  return `<div class="cardio-card" id="cardioCard_${t}">
+    <div class="cardio-header">
+      <div class="cardio-icon">🏃</div>
+      <div>
+        <div class="cardio-title">Cardio — Escada</div>
+        <div class="cardio-sub">Sugestão: ${cardio.sugestao}</div>
+      </div>
+    </div>
+    <div class="cardio-row">
+      <span style="font-size:.68rem;color:var(--muted)">Tempo rápido:</span>
+      <button class="cardio-preset" onclick="presetCardio('${t}','tempo',5)">5 min</button>
+      <button class="cardio-preset" onclick="presetCardio('${t}','tempo',10)">10 min</button>
+      <button class="cardio-preset" onclick="presetCardio('${t}','vel',7)">7 km/h</button>
+      <button class="cardio-preset" onclick="presetCardio('${t}','vel',8)">8 km/h</button>
+    </div>
+    <div class="cardio-fields">
+      <div class="cardio-field">
+        <label>⏱ Tempo (min)</label>
+        <input type="text" inputmode="decimal" class="cardio-inp" id="cardio_tempo_${t}" placeholder="${saved?.tempo||'5'}" value="${saved?.tempo||''}">
+      </div>
+      <div class="cardio-field">
+        <label>💨 Velocidade (km/h)</label>
+        <input type="text" inputmode="decimal" class="cardio-inp" id="cardio_vel_${t}" placeholder="${saved?.vel||'7.5'}" value="${saved?.vel||''}">
+      </div>
+      <div class="cardio-field">
+        <label>📍 Distância (km)</label>
+        <input type="text" inputmode="decimal" class="cardio-inp" id="cardio_dist_${t}" placeholder="${saved?.dist||'0.6'}" value="${saved?.dist||''}">
+      </div>
+      <div class="cardio-field">
+        <label>🔥 Calorias (kcal)</label>
+        <input type="text" inputmode="decimal" class="cardio-inp" id="cardio_cal_${t}" placeholder="${saved?.cal||'—'}" value="${saved?.cal||''}">
+      </div>
+    </div>
+    <button class="cardio-done-btn ${isDone?'done':''}" onclick="saveCardio('${t}')">
+      ${isDone?'✅ Cardio salvo — toque para atualizar':'🏃 Registrar Cardio'}
+    </button>
+    <div class="cardio-saved ${isDone?'show':''}" id="cardioSaved_${t}">
+      ${saved?`✅ ${saved.tempo||'?'} min · ${saved.vel||'?'} km/h · ${saved.dist||'?'} km`:''}
+    </div>
+    ${histHtml}
+  </div>`;
+}
+
+function presetCardio(t, field, val){
+  const inp = document.getElementById('cardio_'+field+'_'+t);
+  if(inp){ inp.value = val; inp.focus(); inp.blur(); }
+}
+
+function saveCardio(t){
+  const tempo = document.getElementById('cardio_tempo_'+t)?.value.trim();
+  const vel   = document.getElementById('cardio_vel_'+t)?.value.trim();
+  const dist  = document.getElementById('cardio_dist_'+t)?.value.trim();
+  const cal   = document.getElementById('cardio_cal_'+t)?.value.trim();
+
+  if(!tempo && !vel){ showToast('Preencha pelo menos tempo ou velocidade'); return; }
+
+  const today = todayStr();
+  const savedKey = 'cardio_'+t+'_'+today;
+  state.cargas[savedKey] = { tempo, vel, dist, cal };
+
+  // save to cardio history
+  if(!state.cargaHistory['cardio_'+t]) state.cargaHistory['cardio_'+t] = [];
+  const hist = state.cargaHistory['cardio_'+t];
+  const existing = hist.findIndex(h=>h.date===today);
+  const entry = { date:today, tempo, vel, dist, cal };
+  if(existing>=0) hist[existing]=entry; else hist.push(entry);
+  if(hist.length>30) hist.shift();
+
+  saveState();
+  haptic([50,30,100]);
+
+  // update UI in place without re-rendering whole treino
+  const btn = document.querySelector(`#cardioCard_${t} .cardio-done-btn`);
+  if(btn){ btn.textContent='✅ Cardio salvo — toque para atualizar'; btn.classList.add('done'); }
+  const savedEl = document.getElementById('cardioSaved_'+t);
+  if(savedEl){ savedEl.textContent=`✅ ${tempo||'?'} min · ${vel||'?'} km/h · ${dist||'?'} km`; savedEl.classList.add('show'); }
+
+  showToast('🏃 Cardio registrado!','success');
 }
 
 function renderTreinoPreserve(t){
@@ -1707,16 +1823,20 @@ function renderCal(){
 function renderHist(){
   const el=document.getElementById('histList');
   if(!state.history.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div>Nenhum treino ainda.<br>Comece hoje!</div>`;return;}
-  el.innerHTML=state.history.slice(0,40).map((h,i)=>`<div class="hist-item">
+  el.innerHTML=state.history.slice(0,40).map((h,i)=>{
+    const cardioKey='cardio_'+h.treino+'_'+h.date;
+    const cardio=state.cargas[cardioKey];
+    return `<div class="hist-item">
     <div class="h-badge h${h.treino}">${h.treino}</div>
     <div class="h-info">
       <div class="h-date">${fmtDate(h.date)}</div>
       <div class="h-name">${TREINOS[h.treino].name}</div>
-      ${h.vol?`<div class="h-vol">📊 Volume: ${h.vol.toLocaleString('pt-BR')}kg total</div>`:''}
+      ${h.vol?`<div class="h-vol">📊 ${h.vol.toLocaleString('pt-BR')}kg volume total</div>`:''}
+      ${cardio?`<div style="font-size:.65rem;color:#fb923c;margin-top:2px">🏃 Escada: ${cardio.tempo||'?'}min · ${cardio.vel||'?'}km/h${cardio.dist?' · '+cardio.dist+'km':''}</div>`:''}
       ${h.obs?`<div class="h-obs">${h.obs}</div>`:''}
     </div>
     <button class="h-del" onclick="delHist(${i})" title="Apagar">🗑</button>
-  </div>`).join('');
+  </div>`;}).join('');
 }
 
 function delHist(i){
