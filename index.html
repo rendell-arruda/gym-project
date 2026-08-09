@@ -1197,7 +1197,7 @@ function renderTreino(t){
             <div class="ex-photo-banner-icon">${{leg:'🦵',back:'🔙',chest:'🫁',bicep:'💪',tricep:'💪',shoulder:'🏋️'}[{A1:'leg',A2:'leg',A3:'back',A4:'back',A5:'back',A6:'back',A7:'bicep',A8:'bicep',A9:'bicep',B1:'leg',B2:'leg',B3:'chest',B4:'chest',B5:'chest',B6:'chest',B7:'chest',B8:'tricep',B9:'tricep',B10:'tricep',C1:'leg',C2:'leg',C3:'shoulder',C4:'shoulder',C5:'shoulder',C6:'shoulder',C7:'shoulder',C8:'shoulder'}[ex.id]]||'💪'}</div>
             <div>
               <div class="ex-photo-banner-name" style="color:${col}">${ex.name}</div>
-              <div class="ex-photo-banner-sub" style="color:${col}">⏱ 1min descanso &nbsp;·&nbsp; 📈 Progressão de carga${ex.nosdescanso?' &nbsp;·&nbsp; 🔁 Sem descanso':''}</div>
+              <div class="ex-photo-banner-sub" style="color:${col}">${ex.nosdescanso?'🔁 Sem descanso entre séries &nbsp;·&nbsp; 📈 Progressão de carga':'⏱ 1min descanso &nbsp;·&nbsp; 📈 Progressão de carga'}${ex.dropset?' &nbsp;·&nbsp; ⬇️ DROP SET':''}</div>
             </div>
           </div>
           ${ex.series.map((reps,i)=>{
