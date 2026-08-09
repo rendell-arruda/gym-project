@@ -1404,12 +1404,16 @@ function toggleSerie(exId,si,t){
             }, 500);
           }
 
-          // check if ALL exercises done → show finish reminder
+          // check if ALL exercises done → auto-finalize!
           setTimeout(()=>{
             const allExDone=tr.sections.every(s=>s.exercises.every(e=>
               e.series.every((_,i)=>state.seriesDone[e.id+'_s'+i])
             ));
-            if(allExDone) showFinishReminder(t);
+            if(allExDone){
+              showToast('🏁 Treino completo! Salvando automaticamente...','success');
+              haptic([100,50,200,50,300]);
+              setTimeout(()=>finalizarTreino(t), 1200);
+            }
           }, 800);
         }
       }
