@@ -808,59 +808,238 @@ function getExSVG(exId, large=false){
 
 
 // ── TREINO DATA ──
+// ── TREINO DATA ──
+// ── TREINO DATA ──
 const TREINOS = {
-  A:{ name:'Treino A', color:'#3b82f6', desc:'Costas + Bíceps + Perna + Escada',
-    sections:[
-      {name:'PERNA',exercises:[
-        {id:'A1',name:'Leg Press 45',series:[15,12,10,8]},
-        {id:'A2',name:'Cadeira Extensora',series:[15,12,10,8]},
-      ]},
-      {name:'COSTAS',exercises:[
-        {id:'A3',name:'Puxador Frente',series:[12,10,8,6]},
-        {id:'A4',name:'Remada Baixa Triângulo',series:[12,10,8,6]},
-        {id:'A5',name:'Remada Polia Corda',series:[12,10,8,6]},
-        {id:'A6',name:'Remada Cavalinho',series:[10,8,6,6]},
-      ]},
-      {name:'BÍCEPS',exercises:[
-        {id:'A7',name:'Rosca Direta Barra W',series:[10,8,6,6]},
-        {id:'A8',name:'Rosca Alternada Sentado',series:[10,8,6,6]},
-        {id:'A9',name:'Rosca Unilateral Polia',series:[10,8,6,6]},
-      ]},
-    ], finalizacao:'Escada → 5 min a 7-8km/h', cardio:{tipo:'escada',sugestao:'5 min · 7-8 km/h'}},
-  B:{ name:'Treino B', color:'#ef4444', desc:'Peito + Tríceps + Perna + Escada',
-    sections:[
-      {name:'PERNA',exercises:[
-        {id:'B1',name:'Stiff',series:[12,10,8,6]},
-        {id:'B2',name:'Flexora Sentada ou Deitada',series:[12,10,8,6]},
-      ]},
-      {name:'PEITO',exercises:[
-        {id:'B3',name:'Supino Reto',series:[12,10,8,6]},
-        {id:'B4',name:'Supino Inclinado Halteres',series:[12,10,8,6]},
-        {id:'B5',name:'Crucifixo',series:[12,10,10,8]},
-        {id:'B6',name:'Supino Máquina DROP SET',series:[10,8,6,'falha'],dropset:true,note:'Baixe o peso a cada série. Última até falhar.'},
-        {id:'B7',name:'Cross Over de Baixo para Cima',series:[15,12,10,10]},
-      ]},
-      {name:'TRÍCEPS',exercises:[
-        {id:'B8',name:'Tríceps Testa na Polia',series:[10,8,6,6]},
-        {id:'B9',name:'Tríceps Corda Polia',series:[12,10,8,8]},
-        {id:'B10',name:'Coice Unilateral Polia',series:[12,10,8,8]},
-      ]},
-    ], finalizacao:'Escada → 5 minutos', cardio:{tipo:'escada',sugestao:'5 min · 7-8 km/h'}},
-  C:{ name:'Treino C', color:'#22c55e', desc:'Ombro + Abdômen + Perna',
-    sections:[
-      {name:'PERNA',exercises:[
-        {id:'C1',name:'Leg Press 90 ou Agachamento Smith',series:[15,12,10,8]},
-        {id:'C2',name:'Cadeira Abdutora',series:[20,20,15,15]},
-      ]},
-      {name:'OMBRO + CORE',exercises:[
-        {id:'C3',name:'Fly Máquina',series:[12,10,8,8]},
-        {id:'C4',name:'Supino Máquina (Ombro)',series:[12,10,8,8]},
-        {id:'C5',name:'Elevação Lateral Halteres',series:[12,10,8,8],note:'🔁 SEM DESCANSO → Abdômen na polia 15 reps',nosdescanso:true},
-        {id:'C6',name:'Elevação Frontal Polia',series:[12,10,8,8],note:'🔁 SEM DESCANSO → Abdômen na polia 15 reps',nosdescanso:true},
-        {id:'C7',name:'Elevação Lateral Polia',series:[15,12,10,10],note:'🔁 SEM DESCANSO → Abdômen na polia 15 reps',nosdescanso:true},
-        {id:'C8',name:'Posterior de Ombro',series:[10,8,8,6],note:'🔁 SEM DESCANSO → Abdômen na polia 15 reps',nosdescanso:true},
-      ]},
-    ], finalizacao:'Escada → 5 minutos', cardio:{tipo:'escada',sugestao:'5 min · 7-8 km/h'}},
+  A: {
+    name: 'Treino A',
+    color: '#3b82f6',
+    desc: 'Perna + Peito + Ombros + Tríceps',
+
+    sections: [
+      {
+        name: 'PERNA',
+        exercises: [
+          {
+            id: 'A1',
+            name: 'Leg Press Horizontal',
+            series: [15, 12, 10, 8],
+            note: 'Aumentar a carga a cada série.'
+          },
+          {
+            id: 'A2',
+            name: 'Panturrilha no Leg Press Horizontal',
+            series: [15, 15, 15, 15]
+          }
+        ]
+      },
+
+      {
+        name: 'PEITO, OMBROS E TRÍCEPS',
+        exercises: [
+          {
+            id: 'A3',
+            name: 'Supino Máquina (Pegada Pronada)',
+            series: [15, 12, 10, 8],
+            note: 'Aumentar a carga a cada série.'
+          },
+          {
+            id: 'A4',
+            name: 'Supino Inclinado Articulado',
+            series: [12, 12, 12]
+          },
+          {
+            id: 'A5',
+            name: 'Crucifixo Inverso Máquina',
+            series: [12, 12, 12],
+            note: 'Mesma carga e reps em todas as séries.'
+          },
+          {
+            id: 'A6',
+            name: 'Crossover Polia Alta',
+            series: [12, 12, 12]
+          },
+          {
+            id: 'A7',
+            name: 'Tríceps Unilateral na Polia Alta (Pegada Neutra)',
+            series: [12, 12, 12]
+          },
+          {
+            id: 'A8',
+            name: 'Tríceps na Polia Barra W',
+            series: [15, 15, 15, 15]
+          }
+        ]
+      }
+    ],
+
+    finalizacao: 'Aeróbico à escolha → 15 a 30 minutos',
+    cardio: {
+      tipo: 'aeróbico',
+      sugestao: '15 a 30 min · modalidade à escolha'
+    }
+  },
+
+  B: {
+    name: 'Treino B',
+    color: '#ef4444',
+    desc: 'Perna + Costas + Bíceps + Antebraço',
+
+    sections: [
+      {
+        name: 'PERNA',
+        exercises: [
+          {
+            id: 'B1',
+            name: 'Agachamento Sumô no Step com Halteres',
+            series: [15, 15, 15],
+            note: 'Fazer 10 agachamentos corporais antes de começar para aquecer.'
+          },
+          {
+            id: 'B2',
+            name: 'Cadeira Extensora Unilateral',
+            series: [15, 15, 15]
+          }
+        ]
+      },
+
+      {
+        name: 'COSTAS',
+        exercises: [
+          {
+            id: 'B3',
+            name: 'Puxada Fechada Barra Reta',
+            series: [15, 12, 10, 8],
+            note: 'Aumentar a carga a cada série.'
+          },
+          {
+            id: 'B4',
+            name: 'Remada Máquina (Pegada Pronada)',
+            series: [12, 12, 12]
+          },
+          {
+            id: 'B5',
+            name: 'Remada Baixa na Polia Baixa (Pegada Supinada)',
+            series: [12, 12, 12]
+          },
+          {
+            id: 'B6',
+            name: 'Remada Unilateral Halteres - Pegada Neutra (Serrote)',
+            series: [12, 12, 12]
+          }
+        ]
+      },
+
+      {
+        name: 'BÍCEPS E ANTEBRAÇO',
+        exercises: [
+          {
+            id: 'B7',
+            name: 'Rosca com Rotação',
+            series: [12, 12, 12]
+          },
+          {
+            id: 'B8',
+            name: 'Rosca Concentrada',
+            series: [12, 12, 12]
+          },
+          {
+            id: 'B9',
+            name: 'Rosca Inversa na Polia Baixa',
+            series: [15, 15, 15]
+          }
+        ]
+      }
+    ],
+
+    finalizacao: 'Aeróbico à escolha → 15 a 30 minutos',
+    cardio: {
+      tipo: 'aeróbico',
+      sugestao: '15 a 30 min · modalidade à escolha'
+    }
+  },
+
+  C: {
+    name: 'Treino C',
+    color: '#22c55e',
+    desc: 'Perna + Ombros + Abdômen',
+
+    sections: [
+      {
+        name: 'PERNA',
+        exercises: [
+          {
+            id: 'C1',
+            name: 'Remada Alta na Polia Baixa com Barra Reta',
+            series: [15, 12, 10, 8],
+            note: 'Aumentar a carga a cada série.'
+          },
+          {
+            id: 'C2',
+            name: 'Cadeira Flexora',
+            series: [12, 12, 12, 12],
+            note: 'Isometria de 2 segundos. Força para descer, segurar por 2 segundos e subir lentamente.'
+          },
+          {
+            id: 'C3',
+            name: 'Elevação Pélvica Máquina',
+            series: [15, 15, 15]
+          },
+          {
+            id: 'C4',
+            name: 'Hiperextensão de Lombar',
+            series: [12, 12, 12],
+            note: 'Abraçar uma anilha de 5 kg. Se ficar leve, usar 10 kg.'
+          }
+        ]
+      },
+
+      {
+        name: 'OMBROS',
+        exercises: [
+          {
+            id: 'C5',
+            name: 'Elevação Frontal Alternada',
+            series: [12, 12, 12],
+            note: 'Mesma carga e reps em todas as séries.'
+          },
+          {
+            id: 'C6',
+            name: 'Desenvolvimento com Halteres Sentado',
+            series: [12, 12, 12],
+            note: 'Mesma carga e reps em todas as séries.'
+          },
+          {
+            id: 'C7',
+            name: 'Encolhimento de Ombros com Halteres',
+            series: [15, 15, 15, 15]
+          }
+        ]
+      },
+
+      {
+        name: 'ABDÔMEN',
+        exercises: [
+          {
+            id: 'C8',
+            name: 'Abdominal Prancha Isométrica',
+            series: ['1 min', '1 min', '1 min']
+          },
+          {
+            id: 'C9',
+            name: 'Abdominal Remador Pés Suspensos',
+            series: [15, 15, 15, 15]
+          }
+        ]
+      }
+    ],
+
+    finalizacao: 'Aeróbico à escolha → 15 a 30 minutos',
+    cardio: {
+      tipo: 'aeróbico',
+      sugestao: '15 a 30 min · modalidade à escolha'
+    }
+  }
 };
 const ALL_EX = [];
 Object.values(TREINOS).forEach(t=>t.sections.forEach(s=>s.exercises.forEach(e=>ALL_EX.push(e))));
