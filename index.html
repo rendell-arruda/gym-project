@@ -379,6 +379,68 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.96);backdrop-fil
 .fr-btn{background:var(--c);color:#000;border:none;border-radius:8px;padding:10px 14px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;flex-shrink:0}
 .fr-close{background:none;border:none;color:rgba(34,197,94,.4);font-size:1.1rem;cursor:pointer;padding:0 4px;flex-shrink:0}
 
+/* ── DIETA ── */
+.dieta-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.dieta-date-nav{display:flex;align-items:center;gap:10px}
+.dieta-nav-btn{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:.85rem}
+.dieta-date-lbl{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700}
+.macro-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px}
+.macro-box{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
+.macro-val{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;line-height:1}
+.macro-lbl{font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.macro-bar-wrap{height:4px;background:var(--surf2);border-radius:20px;margin-top:5px;overflow:hidden}
+.macro-bar{height:100%;border-radius:20px;transition:width .4s}
+.refeicao-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.refeicao-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.refeicao-icon{font-size:1.3rem;flex-shrink:0}
+.refeicao-info{flex:1}
+.refeicao-name{font-weight:700;font-size:.9rem}
+.refeicao-macros{font-size:.65rem;color:var(--muted);margin-top:2px}
+.refeicao-body{display:none;border-top:1px solid var(--border);padding:12px 14px}
+.refeicao-body.open{display:block}
+.alimento-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(42,48,72,.5)}
+.alimento-row:last-of-type{border-bottom:none}
+.alimento-name-inp{background:var(--surf2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:15px;padding:7px 10px;flex:1;font-family:'Inter',sans-serif}
+.alimento-name-inp:focus{outline:none;border-color:var(--acc)}
+.alimento-num{background:var(--surf2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:15px;padding:7px 6px;width:62px;text-align:center;font-family:'Inter',sans-serif}
+.alimento-num:focus{outline:none;border-color:var(--acc)}
+.alimento-unit{font-size:.65rem;color:var(--muted);min-width:22px}
+.alimento-del{background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:4px 6px;flex-shrink:0}
+.alimento-del:active{color:var(--b)}
+.add-alimento-btn{width:100%;padding:9px;border-radius:8px;border:1px dashed var(--border);background:none;color:var(--muted);font-size:.8rem;cursor:pointer;margin-top:8px;font-weight:600}
+.add-alimento-btn:active{border-color:var(--acc);color:var(--acc)}
+.macro-row-small{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px}
+.macro-sm{background:var(--surf2);border-radius:6px;padding:4px;text-align:center}
+.macro-sm-val{font-size:.75rem;font-weight:700}
+.macro-sm-lbl{font-size:.5rem;color:var(--muted)}
+.meta-row{display:flex;gap:8px;margin-bottom:14px}
+.meta-inp-wrap{flex:1;text-align:center}
+.meta-inp-wrap label{font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
+.meta-inp{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:16px;font-weight:700;padding:8px 4px;text-align:center;font-family:'Inter',sans-serif}
+.meta-inp:focus{outline:none;border-color:var(--acc)}
+
+/* ── SAUDE ── */
+.supl-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;position:relative}
+.supl-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.supl-icon{font-size:1.5rem;flex-shrink:0}
+.supl-name{font-weight:700;font-size:.92rem;margin-bottom:2px}
+.supl-info{font-size:.72rem;color:var(--muted);line-height:1.5}
+.supl-days{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:var(--acc)}
+.supl-days-lbl{font-size:.6rem;color:var(--muted)}
+.supl-check-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.supl-check{background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s}
+.supl-check.done{background:var(--c-glow);border-color:var(--c);color:var(--c)}
+.supl-del-btn{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:4px}
+.add-supl-form{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.add-supl-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;margin-bottom:12px;color:var(--acc)}
+.supl-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.supl-form-field label{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px;font-weight:600}
+.supl-inp{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:15px;padding:8px 10px;font-family:'Inter',sans-serif}
+.supl-inp:focus{outline:none;border-color:var(--acc)}
+.supl-add-btn{width:100%;padding:11px;border-radius:9px;border:none;background:var(--acc);color:#000;font-weight:700;font-size:.9rem;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px}
+.today-doses{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:14px}
+.td-title{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+
 /* theme toggle */
 body.light{--bg:#f0f4f8;--surf:#fff;--surf2:#e8edf3;--border:#d1d9e6;--text:#1e2330;--muted:#64748b}
 body.light nav{background:rgba(240,244,248,.96)}
@@ -501,6 +563,8 @@ input:checked+.toggle-slider:before{transform:translateX(20px);background:#000}
   <button class="tab-btn" onclick="showTab('cal')"><span class="tab-icon">📅</span>Calendário</button>
   <button class="tab-btn" onclick="showTab('hist')"><span class="tab-icon">📋</span>Histórico</button>
   <button class="tab-btn" onclick="showTab('prs')"><span class="tab-icon">🏆</span>PRs</button>
+  <button class="tab-btn" onclick="showTab('dieta')"><span class="tab-icon">🥗</span>Dieta</button>
+  <button class="tab-btn" onclick="showTab('saude')"><span class="tab-icon">💊</span>Saúde</button>
   <button class="tab-btn" onclick="showTab('settings')"><span class="tab-icon">⚙️</span>Config</button>
 </div>
 
@@ -670,6 +734,16 @@ input:checked+.toggle-slider:before{transform:translateX(20px);background:#000}
       <div><div class="settings-row-label">MeuTreino</div><div class="settings-row-sub">Versão 2.0 · Feito com 💪 e Claude</div></div>
     </div>
   </div>
+</div>
+
+<!-- DIETA -->
+<div class="page" id="page-dieta">
+  <div id="dietaContent"></div>
+</div>
+
+<!-- SAUDE -->
+<div class="page" id="page-saude">
+  <div id="saudeContent"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1066,7 +1140,7 @@ function saveNames(){
   showToast('✅ Nomes salvos!','success');
 }
 let curUser=null, curPin=null, pendingUid=null;
-let state={selectedTreino:null,cargas:{},cargaHistory:{},seriesDone:{},history:[]};
+let state={selectedTreino:null,cargas:{},cargaHistory:{},seriesDone:{},history:[],dieta:{},saude:{suplementos:[]}};
 let saveTO=null,unsub=null,applyingRemote=false,lastPushTs=null;
 
 function lk(pin){return 'mt5_'+pin;}
@@ -1075,6 +1149,9 @@ function saveLocal(pin,st){localStorage.setItem(lk(pin),JSON.stringify(st));}
 function fixState(st){
   if(!st.cargas)st.cargas={};if(!st.cargaHistory)st.cargaHistory={};
   if(!st.seriesDone)st.seriesDone={};if(!st.history)st.history=[];
+  if(!st.dieta)st.dieta={};
+  if(!st.saude)st.saude={suplementos:[]};
+  if(!st.saude.suplementos)st.saude.suplementos=[];
   return st;
 }
 
@@ -1137,7 +1214,7 @@ function connectCloud(pin){
         const r=snap.data();
         if(r.updatedAt&&r.updatedAt===lastPushTs){setSS('synced','Sincronizado');return;}
         applyingRemote=true;
-        state=fixState({selectedTreino:r.selectedTreino||null,cargas:r.cargas||{},cargaHistory:r.cargaHistory||{},seriesDone:r.seriesDone||{},history:r.history||[]});
+        state=fixState({selectedTreino:r.selectedTreino||null,cargas:r.cargas||{},cargaHistory:r.cargaHistory||{},seriesDone:r.seriesDone||{},history:r.history||[],dieta:r.dieta||{},saude:r.saude||{suplementos:[]}});
         saveLocal(pin,state);
         renderHome(); initCal(); renderHist(); renderPRs();
         const ta=document.getElementById('page-treino').classList.contains('active');
@@ -2316,17 +2393,344 @@ function showTab(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  const tabs=['home','treino','cal','hist','prs','settings'];
+  const tabs=['home','treino','cal','hist','prs','dieta','saude','settings'];
   document.querySelectorAll('.tab-btn')[tabs.indexOf(name)].classList.add('active');
   if(name==='treino'&&state.selectedTreino)renderTreino(state.selectedTreino);
   if(name==='cal')renderCal();
   if(name==='hist')renderHist();
   if(name==='prs')renderPRs();
+  if(name==='dieta')renderDieta();
+  if(name==='saude')renderSaude();
   if(name==='settings')loadSettings();
-  // wake lock: on when treino, off otherwise
   if(name==='treino'&&wakeLockEnabled) requestWakeLock();
   else releaseWakeLock();
 }
+
+// ═══════════════════════════════════════════
+// ── DIETA ──
+// ═══════════════════════════════════════════
+const REFEICOES = [
+  {id:'cafe',    icon:'☀️', name:'Café da Manhã'},
+  {id:'lanche1', icon:'🍎', name:'Lanche da Manhã'},
+  {id:'almoco',  icon:'🍽️', name:'Almoço'},
+  {id:'lanche2', icon:'🥤', name:'Lanche da Tarde'},
+  {id:'jantar',  icon:'🌙', name:'Jantar'},
+  {id:'ceia',    icon:'🌛', name:'Ceia'},
+];
+
+let dietaDate = todayStr(); // currently viewed date
+
+function getDietaDay(date){
+  if(!state.dieta) state.dieta = {};
+  if(!state.dieta[date]) state.dieta[date] = { metas:{kcal:2000,prot:150,carb:200,gord:60}, refeicoes:{} };
+  REFEICOES.forEach(r=>{ if(!state.dieta[date].refeicoes[r.id]) state.dieta[date].refeicoes[r.id]=[]; });
+  return state.dieta[date];
+}
+
+function calcMacros(alimentos){
+  return alimentos.reduce((acc,a)=>({
+    kcal: acc.kcal + (parseFloat(a.kcal)||0),
+    prot: acc.prot + (parseFloat(a.prot)||0),
+    carb: acc.carb + (parseFloat(a.carb)||0),
+    gord: acc.gord + (parseFloat(a.gord)||0),
+  }),{kcal:0,prot:0,carb:0,gord:0});
+}
+
+function calcDayMacros(date){
+  const day = getDietaDay(date);
+  const all = Object.values(day.refeicoes).flat();
+  return calcMacros(all);
+}
+
+function renderDieta(){
+  const day = getDietaDay(dietaDate);
+  const metas = day.metas;
+  const totals = calcDayMacros(dietaDate);
+  const isToday = dietaDate === todayStr();
+  const dateLabel = isToday ? 'Hoje' : dietaDate === yesterdayStr() ? 'Ontem' : fmtDate(dietaDate);
+
+  const pct = (val,meta) => Math.min(100, Math.round(val/meta*100));
+  const bar = (val,meta,col) => `<div class="macro-bar-wrap"><div class="macro-bar" style="width:${pct(val,meta)}%;background:${col}"></div></div>`;
+
+  let html = `
+  <div class="dieta-header">
+    <div class="dieta-date-nav">
+      <button class="dieta-nav-btn" onclick="changeDietaDate(-1)">‹</button>
+      <div class="dieta-date-lbl">${dateLabel}</div>
+      <button class="dieta-nav-btn" onclick="changeDietaDate(1)" ${isToday?'disabled style="opacity:.4"':''}>›</button>
+    </div>
+    <button onclick="toggleMetasEdit()" style="font-size:.7rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:7px;padding:4px 10px;cursor:pointer">⚙️ Metas</button>
+  </div>
+
+  <!-- metas edit (hidden by default) -->
+  <div id="metasEdit" style="display:none;margin-bottom:14px">
+    <div class="meta-row">
+      <div class="meta-inp-wrap"><label>🔥 Kcal</label><input type="text" inputmode="decimal" class="meta-inp" id="metaKcal" value="${metas.kcal}" onchange="saveMeta('kcal',this.value)"></div>
+      <div class="meta-inp-wrap"><label>🥩 Proteína g</label><input type="text" inputmode="decimal" class="meta-inp" id="metaProt" value="${metas.prot}" onchange="saveMeta('prot',this.value)"></div>
+      <div class="meta-inp-wrap"><label>🍞 Carbo g</label><input type="text" inputmode="decimal" class="meta-inp" id="metaCarb" value="${metas.carb}" onchange="saveMeta('carb',this.value)"></div>
+      <div class="meta-inp-wrap"><label>🥑 Gord g</label><input type="text" inputmode="decimal" class="meta-inp" id="metaGord" value="${metas.gord}" onchange="saveMeta('gord',this.value)"></div>
+    </div>
+  </div>
+
+  <!-- macro totals -->
+  <div class="macro-strip">
+    <div class="macro-box">
+      <div class="macro-val" style="color:#f59e0b">${Math.round(totals.kcal)}</div>
+      <div class="macro-lbl">🔥 kcal</div>
+      ${bar(totals.kcal,metas.kcal,'#f59e0b')}
+      <div style="font-size:.55rem;color:var(--muted);margin-top:3px">${Math.round(totals.kcal)}/${metas.kcal}</div>
+    </div>
+    <div class="macro-box">
+      <div class="macro-val" style="color:#3b82f6">${Math.round(totals.prot)}g</div>
+      <div class="macro-lbl">🥩 Prot</div>
+      ${bar(totals.prot,metas.prot,'#3b82f6')}
+      <div style="font-size:.55rem;color:var(--muted);margin-top:3px">${Math.round(totals.prot)}/${metas.prot}g</div>
+    </div>
+    <div class="macro-box">
+      <div class="macro-val" style="color:#f97316">${Math.round(totals.carb)}g</div>
+      <div class="macro-lbl">🍞 Carbo</div>
+      ${bar(totals.carb,metas.carb,'#f97316')}
+      <div style="font-size:.55rem;color:var(--muted);margin-top:3px">${Math.round(totals.carb)}/${metas.carb}g</div>
+    </div>
+    <div class="macro-box">
+      <div class="macro-val" style="color:#a855f7">${Math.round(totals.gord)}g</div>
+      <div class="macro-lbl">🥑 Gord</div>
+      ${bar(totals.gord,metas.gord,'#a855f7')}
+      <div style="font-size:.55rem;color:var(--muted);margin-top:3px">${Math.round(totals.gord)}/${metas.gord}g</div>
+    </div>
+  </div>
+
+  <!-- refeicoes -->
+  ${REFEICOES.map(ref => {
+    const alimentos = day.refeicoes[ref.id] || [];
+    const rm = calcMacros(alimentos);
+    return `<div class="refeicao-card" id="refCard_${ref.id}">
+      <div class="refeicao-head" onclick="toggleRef('${ref.id}')">
+        <div class="refeicao-icon">${ref.icon}</div>
+        <div class="refeicao-info">
+          <div class="refeicao-name">${ref.name} ${alimentos.length?`<span style="color:var(--acc);font-size:.75rem">(${alimentos.length} item${alimentos.length>1?'s':''})</span>`:''}</div>
+          ${rm.kcal>0?`<div class="refeicao-macros">${Math.round(rm.kcal)} kcal · ${Math.round(rm.prot)}g prot · ${Math.round(rm.carb)}g carb · ${Math.round(rm.gord)}g gord</div>`:'<div class="refeicao-macros">Vazio — toque para adicionar</div>'}
+        </div>
+        <div class="ex-arr" id="refArr_${ref.id}">›</div>
+      </div>
+      <div class="refeicao-body" id="refBody_${ref.id}">
+        <div style="display:grid;grid-template-columns:1fr 52px 52px 52px 52px 24px;gap:4px;padding:4px 0 6px;font-size:.55rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px">
+          <span>Alimento</span><span style="text-align:center">Kcal</span><span style="text-align:center">Prot</span><span style="text-align:center">Carb</span><span style="text-align:center">Gord</span><span></span>
+        </div>
+        ${alimentos.map((a,i)=>`<div class="alimento-row">
+          <input class="alimento-name-inp" type="text" placeholder="Ex: Frango grelhado" value="${a.nome||''}" onchange="updateAlimento('${dietaDate}','${ref.id}',${i},'nome',this.value)">
+          <input class="alimento-num" type="text" inputmode="decimal" placeholder="0" value="${a.kcal||''}" onchange="updateAlimento('${dietaDate}','${ref.id}',${i},'kcal',this.value)">
+          <input class="alimento-num" type="text" inputmode="decimal" placeholder="0" value="${a.prot||''}" onchange="updateAlimento('${dietaDate}','${ref.id}',${i},'prot',this.value)">
+          <input class="alimento-num" type="text" inputmode="decimal" placeholder="0" value="${a.carb||''}" onchange="updateAlimento('${dietaDate}','${ref.id}',${i},'carb',this.value)">
+          <input class="alimento-num" type="text" inputmode="decimal" placeholder="0" value="${a.gord||''}" onchange="updateAlimento('${dietaDate}','${ref.id}',${i},'gord',this.value)">
+          <button class="alimento-del" onclick="removeAlimento('${dietaDate}','${ref.id}',${i})">✕</button>
+        </div>`).join('')}
+        <button class="add-alimento-btn" onclick="addAlimento('${dietaDate}','${ref.id}')">+ Adicionar alimento</button>
+        ${rm.kcal>0?`<div class="macro-row-small">
+          <div class="macro-sm"><div class="macro-sm-val" style="color:#f59e0b">${Math.round(rm.kcal)}</div><div class="macro-sm-lbl">kcal</div></div>
+          <div class="macro-sm"><div class="macro-sm-val" style="color:#3b82f6">${Math.round(rm.prot)}g</div><div class="macro-sm-lbl">prot</div></div>
+          <div class="macro-sm"><div class="macro-sm-val" style="color:#f97316">${Math.round(rm.carb)}g</div><div class="macro-sm-lbl">carb</div></div>
+          <div class="macro-sm"><div class="macro-sm-val" style="color:#a855f7">${Math.round(rm.gord)}g</div><div class="macro-sm-lbl">gord</div></div>
+        </div>`:''}
+      </div>
+    </div>`;
+  }).join('')}`;
+
+  document.getElementById('dietaContent').innerHTML = html;
+}
+
+function toggleRef(id){
+  const body=document.getElementById('refBody_'+id);
+  const arr=document.getElementById('refArr_'+id);
+  body.classList.toggle('open'); arr.classList.toggle('open');
+}
+function toggleMetasEdit(){
+  const el=document.getElementById('metasEdit');
+  if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+function saveMeta(field, val){
+  const day=getDietaDay(dietaDate);
+  day.metas[field]=parseFloat(val)||0;
+  saveState(); renderDieta();
+}
+function changeDietaDate(delta){
+  const d=new Date(dietaDate+'T12:00:00'); d.setDate(d.getDate()+delta);
+  const newDate=d.toISOString().split('T')[0];
+  if(newDate>todayStr()) return;
+  dietaDate=newDate; renderDieta();
+}
+function addAlimento(date, refId){
+  const day=getDietaDay(date);
+  day.refeicoes[refId].push({nome:'',kcal:'',prot:'',carb:'',gord:''});
+  saveState(); renderDieta();
+  // reopen the card
+  setTimeout(()=>{
+    const body=document.getElementById('refBody_'+refId);
+    const arr=document.getElementById('refArr_'+refId);
+    if(body&&!body.classList.contains('open')){ body.classList.add('open'); if(arr) arr.classList.add('open'); }
+    // focus last name input
+    const inputs=body?.querySelectorAll('.alimento-name-inp');
+    if(inputs?.length) inputs[inputs.length-1].focus();
+  },50);
+}
+function removeAlimento(date, refId, idx){
+  const day=getDietaDay(date);
+  day.refeicoes[refId].splice(idx,1);
+  saveState(); renderDieta();
+  setTimeout(()=>{ const body=document.getElementById('refBody_'+refId); const arr=document.getElementById('refArr_'+refId); if(body){ body.classList.add('open'); if(arr) arr.classList.add('open'); }},30);
+}
+function updateAlimento(date, refId, idx, field, val){
+  const day=getDietaDay(date);
+  if(day.refeicoes[refId]?.[idx]) day.refeicoes[refId][idx][field]=val;
+  saveState();
+  // update macro strip live without full re-render
+  const totals=calcDayMacros(date);
+  const strip=document.querySelector('.macro-strip');
+  if(strip){
+    [['kcal','#f59e0b'],['prot','#3b82f6'],['carb','#f97316'],['gord','#a855f7']].forEach(([f,col],i)=>{
+      const box=strip.children[i];
+      if(!box) return;
+      const meta=getDietaDay(date).metas[f];
+      box.querySelector('.macro-val').textContent=Math.round(totals[f])+(f!=='kcal'?'g':'');
+      box.querySelector('.macro-bar').style.width=Math.min(100,Math.round(totals[f]/meta*100))+'%';
+      box.lastElementChild.textContent=Math.round(totals[f])+'/'+(f!=='kcal'?meta+'g':meta);
+    });
+  }
+}
+
+// ═══════════════════════════════════════════
+// ── SAUDE ──
+// ═══════════════════════════════════════════
+function getSaude(){
+  if(!state.saude) state.saude={suplementos:[]};
+  if(!state.saude.suplementos) state.saude.suplementos=[];
+  return state.saude;
+}
+
+function calcDias(dataInicio){
+  if(!dataInicio) return 0;
+  const start=new Date(dataInicio+'T12:00:00');
+  const today=new Date(todayStr()+'T12:00:00');
+  return Math.max(0,Math.round((today-start)/(1000*60*60*24)));
+}
+
+function renderSaude(){
+  const saude=getSaude();
+  const todayKey=todayStr();
+
+  // Today's dose summary
+  const totalDoses=saude.suplementos.length;
+  const doneToday=saude.suplementos.filter(s=>(s.doses||{})[todayKey]).length;
+
+  let html=`
+  <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+    <span>💊 Suplementos & Medicamentos</span>
+    <span style="color:${doneToday===totalDoses&&totalDoses>0?'var(--c)':'var(--acc)'}">${doneToday}/${totalDoses} hoje</span>
+  </div>
+
+  <!-- add form -->
+  <div class="add-supl-form">
+    <div class="add-supl-title">+ Adicionar</div>
+    <div class="supl-form-grid">
+      <div class="supl-form-field" style="grid-column:span 2">
+        <label>Nome</label>
+        <input class="supl-inp" id="sNome" placeholder="Ex: Creatina, Whey, Ômega 3..." type="text">
+      </div>
+      <div class="supl-form-field">
+        <label>Dose</label>
+        <input class="supl-inp" id="sDose" placeholder="Ex: 5g, 1 cápsula" type="text">
+      </div>
+      <div class="supl-form-field">
+        <label>Vezes por dia</label>
+        <input class="supl-inp" id="sFreq" placeholder="Ex: 1, 2, 3" type="text" inputmode="numeric">
+      </div>
+      <div class="supl-form-field">
+        <label>Horário</label>
+        <input class="supl-inp" id="sHorario" placeholder="Ex: Manhã, Pré-treino" type="text">
+      </div>
+      <div class="supl-form-field">
+        <label>Início</label>
+        <input class="supl-inp" id="sInicio" type="date" value="${todayKey}">
+      </div>
+    </div>
+    <button class="supl-add-btn" onclick="addSuplemento()">ADICIONAR 💊</button>
+  </div>
+
+  <!-- list -->
+  ${saude.suplementos.length===0?`<div class="empty-state"><div class="empty-icon">💊</div>Nenhum suplemento cadastrado ainda.</div>`:''}
+  ${saude.suplementos.map((s,i)=>{
+    const dias=calcDias(s.inicio);
+    const doses=s.doses||{};
+    const doseHoje=doses[todayKey]||0;
+    const freq=parseInt(s.freq)||1;
+    const completo=doseHoje>=freq;
+    // build dose check buttons
+    const doseBtns=Array.from({length:freq},(_,d)=>`<button class="supl-check ${d<doseHoje?'done':''}" onclick="registrarDose(${i},${d})">${d<doseHoje?'✓':d+1+'ª dose'}</button>`).join('');
+    return `<div class="supl-card" style="${completo?'border-color:rgba(34,197,94,.35)':''}">
+      <button class="supl-del-btn" onclick="deleteSuplemento(${i})">🗑</button>
+      <div class="supl-header">
+        <div class="supl-icon">💊</div>
+        <div style="flex:1">
+          <div class="supl-name">${s.nome}</div>
+          <div class="supl-info">
+            ${s.dose?`📏 ${s.dose}<br>`:''}
+            ${s.freq?`🔁 ${s.freq}x por dia${s.horario?' · ⏰ '+s.horario:''}<br>`:''}
+            ${s.inicio?`📅 Desde ${fmtDate(s.inicio)}`:''}
+          </div>
+        </div>
+        <div style="text-align:center;flex-shrink:0">
+          <div class="supl-days">${dias}</div>
+          <div class="supl-days-lbl">dia${dias!==1?'s':''}</div>
+        </div>
+      </div>
+      <div class="supl-check-row">${doseBtns}</div>
+      ${completo?`<div style="font-size:.68rem;color:var(--c);margin-top:6px;text-align:center">✅ Todas as doses de hoje concluídas!</div>`:''}
+    </div>`;
+  }).join('')}`;
+
+  document.getElementById('saudeContent').innerHTML=html;
+}
+
+function addSuplemento(){
+  const nome=document.getElementById('sNome')?.value.trim();
+  if(!nome){showToast('Digite o nome do suplemento');return;}
+  const saude=getSaude();
+  saude.suplementos.unshift({
+    nome,
+    dose: document.getElementById('sDose')?.value.trim()||'',
+    freq: document.getElementById('sFreq')?.value.trim()||'1',
+    horario: document.getElementById('sHorario')?.value.trim()||'',
+    inicio: document.getElementById('sInicio')?.value||todayStr(),
+    doses: {}
+  });
+  saveState(); renderSaude();
+  showToast('💊 '+nome+' adicionado!','success');
+  haptic([30,20,50]);
+}
+
+function deleteSuplemento(i){
+  if(!confirm('Remover este suplemento?')) return;
+  getSaude().suplementos.splice(i,1);
+  saveState(); renderSaude();
+}
+
+function registrarDose(suplIdx, doseIdx){
+  const saude=getSaude();
+  const s=saude.suplementos[suplIdx];
+  if(!s) return;
+  if(!s.doses) s.doses={};
+  const today=todayStr();
+  const current=s.doses[today]||0;
+  const freq=parseInt(s.freq)||1;
+  // toggle: if clicking already done dose, undo; else advance
+  if(doseIdx < current){
+    s.doses[today]=doseIdx; // undo to this point
+  } else {
+    s.doses[today]=Math.min(freq, doseIdx+1);
+  }
+  saveState(); renderSaude(); haptic([20]);
+}
+
 
 // ── INIT ──
 loadSettings();
